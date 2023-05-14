@@ -1,0 +1,73 @@
+﻿@page "/register"
+@page "/register/{Email}"
+@using AccuFin.Api.Client.Authentication;
+@layout AuthenticationLayout
+
+
+<MudTextField T="string" Label="Email" @bind-Value="Email" InputType="InputType.Email" InputMode="InputMode.email" />
+<MudTextField T="string" Label="Wachtwoord" @bind-Value="Password" InputType="InputType.Password" />
+<MudTextField T="string" Label="Wachtwoord bevestigen" @bind-Value="Password2" InputType="InputType.Password" />
+@foreach (var error in Errors)
+{
+    <MudAlert Severity="Severity.Error">@error</MudAlert>
+}
+@if (Busy)
+{
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" />
+}
+<div class="d-flex justify-end flex-grow-1 gap-4 mt-3">
+    <MudButton Variant="Variant.Filled" Color="Color.Secondary" Class="object-left" OnClick="DoRegister" Disabled="@Busy">Registreren</MudButton>
+</div>
+
+<MudLink Href="@(string.IsNullOrWhiteSpace(Email) ? "emailverify": "emailverify/"+ Email)">Bevestigings code invoeren</MudLink>
+@code {
+    [Inject]
+    public AuthenticationClient AuthenticationClient { get; set; }
+    [Inject]
+    public NavigationManager NavigationManager { get; set; }
+    [Parameter]
+    public string Email { get; set; }
+    public string Password { get; set; }
+    public string Password2 { get; set; }
+    public bool Busy { get; set; }
+    public List<string> Errors { get; set; } = new List<string>();
+    public async Task DoRegister()
+    {
+        if (Busy)
+        {
+            return;
+        }
+        var emailAdress = Email;
+        Errors.Clear();
+        if (string.IsNullOrWhiteSpace(emailAdress) || string.IsNullOrWhiteSpace(Password))
+        {
+            return;
+        }
+        if (Password != Password2)
+        {
+            Errors.Add("Wachtwoorden komen niet overeen");
+            return;
+        }
+        Busy = true;
+        var response = await AuthenticationClient.RegisterUserAsync(emailAdress, Password);
+        if (!response.Success)
+        {
+            if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            {
+                Errors = response.ErrorData.Select(b => b.Description).Where(b => !string.IsNullOrWhiteSpace(b)).ToList();
+            }
+            else
+            {
+                Errors.Add("Onbekende fout, probeer later opnieuw");
+            }
+            Busy = false;
+            return;
+        }
+        else
+        {
+            Busy = false;
+            NavigationManager.NavigateTo("emailverify/" + emailAdress);
+        }
+    }
+
+}

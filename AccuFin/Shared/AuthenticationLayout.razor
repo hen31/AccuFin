@@ -1,0 +1,34 @@
+﻿@inherits LayoutComponentBase
+<MudLayout>
+    <MudMainContent Class="mud-theme-primary" Style="min-height:100vh">
+        <MudContainer MaxWidth="MaxWidth.Small" Style="text-align:center">
+            <MudImage Src="images/default.png" Style="max-width:50%"/>
+            <MudPaper Elevation="3" Class="pa-3" Style="text-align:left">
+                @Body
+            </MudPaper>
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+
+@code {
+
+    bool _drawerOpen = false;
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+}
+<MudThemeProvider Theme="DefaultTheme" />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+@code {
+    MudTheme DefaultTheme = new MudTheme()
+        {
+            Palette = new PaletteLight()
+            {
+                Primary = new MudBlazor.Utilities.MudColor("#4D65F1")
+            }
+        };
+}

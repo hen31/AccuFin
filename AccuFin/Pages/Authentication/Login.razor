@@ -1,0 +1,97 @@
+﻿@page "/login"
+@page "/login/{Email}"
+@using AccuFin.Api.Client.Authentication;
+@using AccuFin.Services;
+@layout AuthenticationLayout
+
+
+<MudTextField T="string" Label="Email" @bind-Value="Email" InputType="InputType.Email" />
+<MudTextField T="string" Label="Wachtwoord" @bind-Value="Password" InputType="InputType.Password" OnKeyUp="KeyUp" />
+@foreach (var error in Errors)
+{
+    <MudAlert Severity="Severity.Error">@error</MudAlert>
+}
+@if (Busy)
+{
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" />
+}
+<div class="d-flex justify-end flex-grow-1 gap-4 mt-3">
+    <MudButton Variant="Variant.Filled" Color="Color.Secondary" Class="object-left" Href="@(string.IsNullOrWhiteSpace(Email) ? "register": "register/"+ Email)">Registeren</MudButton>
+
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="object-right" Disabled="@Busy" OnClick="DoLogin">Inloggen</MudButton>
+</div>
+<MudLink Href="@(string.IsNullOrWhiteSpace(Email) ? "resetpassword/false": "resetpassword/"+ Email + "/false")">Wachtwoord vergeten...</MudLink>
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        var responseMe = await AuthenticationClient.CheckMe();
+        if (responseMe.Success)
+        {
+            NavigationManager.NavigateTo("/");
+        }
+    }
+    [Inject]
+    public AuthenticationClient AuthenticationClient { get; set; }
+    [Inject]
+    public NavigationManager NavigationManager { get; set; }
+    [Inject]
+    public ClientAuthentication ContextProvider { get; set; }
+    [Parameter]
+    public string Email { get; set; }
+    public string Password { get; set; }
+
+    public bool Busy { get; set; }
+    public List<string> Errors { get; set; } = new List<string>();
+    public async Task DoLogin()
+    {
+        if (Busy)
+        {
+            return;
+        }
+        Busy = true;
+        if (!string.IsNullOrWhiteSpace(Email) && !string.IsNullOrWhiteSpace(Password))
+        {
+            var response = await AuthenticationClient.LoginAsync(Email, Password);
+            if (!response.Success)
+            {
+                if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+                {
+                    Errors = response.ErrorData.Select(b => b.Description).Where(b => !string.IsNullOrWhiteSpace(b)).ToList();
+                }
+                else
+                {
+                    Errors.Add("Onbekende fout, probeer later opnieuw");
+                }
+                Busy = false;
+                return;
+            }
+            else
+            {
+                await ContextProvider.SetToken(response.Data.Token);
+                await ContextProvider.SetRefreshTokenAsync(response.Data.RefreshToken);
+                var responseMe = await AuthenticationClient.CheckMe();
+                if (responseMe.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    Errors.Add("Onbekende fout, probeer later opnieuw");
+                    return;
+                }
+                NavigationManager.NavigateTo("/");
+                //Login
+            }
+            Busy = false;
+        }
+        else
+        {
+            Busy = false;
+        }
+    }
+
+    public async Task KeyUp(KeyboardEventArgs args)
+    {
+        if (args.Code == "Enter")
+        {
+            await DoLogin();
+        }
+    }
+
+}

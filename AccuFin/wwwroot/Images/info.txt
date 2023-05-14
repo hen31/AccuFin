@@ -1,0 +1,14 @@
+
+Hope you enjoy your new logo, here are the people that
+made your beautiful logo happen :)
+font name: Archivo-Regular
+font link: https://fonts.google.com/specimen/Archivo
+font author: Omnibus-Type
+font author site: http://www.omnibus-type.com/
+
+
+icon designer: Alfredo @ IconsAlfredo.us
+icon designer link: /AlfredoCreates
+        
+{"bg":"#4D65F1","font":"#ffffff","icon":"#ffffff","slogan":"#ffffff"}
+      

@@ -1,0 +1,49 @@
+﻿@using AccuFin.Services;
+@using Blazored.LocalStorage;
+@inherits LayoutComponentBase
+<MudLayout>
+    <MudAppBar Elevation="1">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+        <MudSpacer />
+        <img src="images/header.png" style="max-height: 100%;" />
+    </MudAppBar>
+    <MudDrawer ClipMode="DrawerClipMode.Docked" @bind-Open="_drawerOpen" Variant="@DrawerVariant.Persistent" Elevation="2" Color="Color.Primary">
+        <MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Logout" OnClick="LogOff" IconColor="Color.Inherit">Uitloggen</MudNavLink>
+    </MudDrawer>
+    <MudMainContent>
+        @Body
+    </MudMainContent>
+</MudLayout>
+
+
+<MudThemeProvider Theme="@DefaultTheme" />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+@code {
+    MudTheme DefaultTheme = new MudTheme()
+        {
+            Palette = new PaletteLight()
+            {
+                Primary = new MudBlazor.Utilities.MudColor("#4D65F1"),
+                AppbarBackground = new MudBlazor.Utilities.MudColor("#4D65F1"),
+            }
+        };
+    bool _drawerOpen = true;
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+
+    [Inject]
+    private ClientAuthentication ClientAuthentication { get; set; }
+    [Inject]
+    private NavigationManager NavigationManager { get; set; }
+    public async Task LogOff()
+    {
+        await ClientAuthentication.SetToken(null);
+        await ClientAuthentication.SetRefreshTokenAsync(null);
+        NavigationManager.NavigateTo("/login");
+    }
+}
