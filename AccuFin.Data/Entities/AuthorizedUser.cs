@@ -8,8 +8,8 @@ namespace AccuFin.Data.Entities
 {
     public class AuthorizedUser : BaseEntityGuidId
     {
-        public string Name { get; set; }
         public string EmailAdress { get; set; }
+        public string Name { get; set; }
         public string Telephone { get; set; }
         public string MobileNumber { get; set; }
     }

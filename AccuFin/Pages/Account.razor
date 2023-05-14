@@ -1,0 +1,50 @@
+﻿@page "/account"
+@using FluentValidation;
+
+@if (Model != null)
+{
+    <MudForm Model="@Model" Validation="@(Model.ValidateValue())" ValidationDelay="0" @ref="@Form">
+        <MudCard>
+            <MudCardContent>
+                <MudTextField Label="Naam"
+                          @bind-Value="Model.Name" For="@(() => Model.Name)" />
+                <MudTextField Label="Telefoon" Class="mt-3"
+                          @bind-Value="Model.Telephone" For="@(() =>Model.Telephone)" />
+                <MudTextField Label="Mobiel" Class="mt-3"
+                          @bind-Value="Model.MobileNumber" For="@(() =>Model.MobileNumber)" />
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton  Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="OnSave">Wijzigen</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </MudForm>
+}
+else
+{
+    <MudProgressCircular Indeterminate="true" />
+}
+
+
+@code {
+
+    [Inject]
+    public UserClient UserClient { get; set; }
+
+    public CurrentUserModel Model { get; set; }
+
+    public MudForm Form { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        Model = (await UserClient.GetCurrentUserAsync()).Data;
+    }
+
+    private async Task OnSave()
+    {
+        await Form.Validate();
+        if (Form.IsValid)
+        {
+            Model = (await UserClient.UpdateCurrentUserAsync(Model)).Data;
+        }
+        StateHasChanged();
+    }
+}

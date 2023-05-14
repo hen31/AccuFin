@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AccuFin.Data.Entities;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,5 +13,7 @@ namespace AccuFin.Data
         public AccuFinDatabaseContext(DbContextOptions<AccuFinDatabaseContext> options) : base(options)
         {
         }
+
+        public DbSet<AuthorizedUser> AuthorizedUsers { get; set; }
     }
 }

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using AccuFin.Api.Data;
+using AccuFin.Repository;
 using AccuFin.Api.Services;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using AccuFin.Api.Areas.Identity.Data;
@@ -15,6 +16,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Authentication;
+using AccuFin.Api.Client;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("IdentityContextConnection") ?? throw new InvalidOperationException("Connection string 'IdentityContextConnection' not found.");
@@ -65,6 +67,8 @@ builder.Services.AddAuthentication(options =>
     };
 });
 builder.Services.AddTransient<IEmailSender, EmailSender>();
+builder.Services.AddAccuFinRepositories();
+builder.Services.AddAccuFinModels();
 
 var app = builder.Build();
 app.MapControllers();
@@ -81,10 +85,10 @@ using (var scope = app.Services.CreateScope())
     databaseContext?.Database.EnsureCreated();
     databaseContext?.Database.Migrate();
 
-    /*    var databaseContextImkery = scope.ServiceProvider.GetService<AccuFinDatabaseContext>();
-        //databaseContextImkery?.Database.EnsureDeleted();
-        databaseContextImkery?.Database.EnsureCreated();
-        databaseContextImkery?.Database.Migrate();*/
+    var databaseContextImkery = scope.ServiceProvider.GetService<AccuFinDatabaseContext>();
+    //databaseContextImkery?.Database.EnsureDeleted();
+    databaseContextImkery?.Database.EnsureCreated();
+    databaseContextImkery?.Database.Migrate();
 }
 
 app.Run();

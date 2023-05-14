@@ -3,17 +3,19 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.33627.172
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccuFin.Data", "AccuFin.Data\AccuFin.Data.csproj", "{D2591E4D-DE93-45F6-A0BC-61F5F765F0DC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccuFin.Data", "AccuFin.Data\AccuFin.Data.csproj", "{D2591E4D-DE93-45F6-A0BC-61F5F765F0DC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccuFin.Api", "AccuFin.Api\AccuFin.Api.csproj", "{88D4EBA2-11CB-4118-806A-303567D9865D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccuFin.Api", "AccuFin.Api\AccuFin.Api.csproj", "{88D4EBA2-11CB-4118-806A-303567D9865D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccuFin.Api.Client", "AccuFin.Api.Client\AccuFin.Api.Client.csproj", "{AB4EBAFF-B484-4615-9013-9DE4959B7F85}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccuFin.Api.Client", "AccuFin.Api.Client\AccuFin.Api.Client.csproj", "{AB4EBAFF-B484-4615-9013-9DE4959B7F85}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccuFin.Test", "AccuFin.Test\AccuFin.Test.csproj", "{F0B662BD-2C75-4AFD-8DAF-B9FAA551FCF0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccuFin.Test", "AccuFin.Test\AccuFin.Test.csproj", "{F0B662BD-2C75-4AFD-8DAF-B9FAA551FCF0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccuFin.Api.Models", "AccuFin.Api.Models\AccuFin.Api.Models.csproj", "{E207A87C-8C5C-418A-BDFC-E57F5AEF1936}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccuFin.Api.Models", "AccuFin.Api.Models\AccuFin.Api.Models.csproj", "{E207A87C-8C5C-418A-BDFC-E57F5AEF1936}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccuFin", "AccuFin\AccuFin.csproj", "{199C75B4-CAE1-4ED5-BAAC-EF935C518227}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccuFin", "AccuFin\AccuFin.csproj", "{199C75B4-CAE1-4ED5-BAAC-EF935C518227}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccuFin.Repository", "AccuFin.Repository\AccuFin.Repository.csproj", "{42E1F2DB-8A2E-49CB-B109-588E402D8248}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{199C75B4-CAE1-4ED5-BAAC-EF935C518227}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{199C75B4-CAE1-4ED5-BAAC-EF935C518227}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{199C75B4-CAE1-4ED5-BAAC-EF935C518227}.Release|Any CPU.Build.0 = Release|Any CPU
+		{42E1F2DB-8A2E-49CB-B109-588E402D8248}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{42E1F2DB-8A2E-49CB-B109-588E402D8248}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{42E1F2DB-8A2E-49CB-B109-588E402D8248}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{42E1F2DB-8A2E-49CB-B109-588E402D8248}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

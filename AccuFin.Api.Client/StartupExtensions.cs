@@ -12,6 +12,8 @@ namespace AccuFin.Api.Client
         public static void AddAccuFinClients(this IServiceCollection serviceCollection)
         {
             serviceCollection.AddScoped<AuthenticationClient>();
+            serviceCollection.AddScoped<UserClient>();
         }
+        
     }
 }

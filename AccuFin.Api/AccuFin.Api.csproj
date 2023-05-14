@@ -23,6 +23,7 @@
   <ItemGroup>
     <ProjectReference Include="..\AccuFin.Api.Models\AccuFin.Api.Models.csproj" />
     <ProjectReference Include="..\AccuFin.Data\AccuFin.Data.csproj" />
+    <ProjectReference Include="..\AccuFin.Repository\AccuFin.Repository.csproj" />
   </ItemGroup>
 
 </Project>
