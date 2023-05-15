@@ -15,5 +15,7 @@ namespace AccuFin.Data
         }
 
         public DbSet<AuthorizedUser> AuthorizedUsers { get; set; }
+        public DbSet<Administration> Administrations { get; set; }
+        public DbSet<UserAdministrationLink> UserAdministrationLink { get; set; }
     }
 }

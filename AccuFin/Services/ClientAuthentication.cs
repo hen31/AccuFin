@@ -22,7 +22,7 @@ namespace AccuFin.Services
             return await _localStorage.GetItemAsync<string>("refresh_token");
         }
 
-        public async Task<string> GetToken()
+        public async Task<string> GetTokenAsync()
         {
             return await _localStorage.GetItemAsync<string>("token");
         }

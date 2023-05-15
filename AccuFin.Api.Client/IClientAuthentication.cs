@@ -9,7 +9,7 @@ namespace AccuFin.Api.Client
     {
         public Task SetRefreshTokenAsync(string token);
         public Task<string> GetRefreshTokenAsync();
-        public Task<string> GetToken();
+        public Task<string> GetTokenAsync();
         public Task SetToken(string token);
 
         public string GetClientId();

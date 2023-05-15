@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccuFin.Api.Models", "AccuF
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccuFin", "AccuFin\AccuFin.csproj", "{199C75B4-CAE1-4ED5-BAAC-EF935C518227}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccuFin.Repository", "AccuFin.Repository\AccuFin.Repository.csproj", "{42E1F2DB-8A2E-49CB-B109-588E402D8248}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccuFin.Repository", "AccuFin.Repository\AccuFin.Repository.csproj", "{42E1F2DB-8A2E-49CB-B109-588E402D8248}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

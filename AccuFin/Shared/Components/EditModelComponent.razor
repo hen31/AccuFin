@@ -1,0 +1,84 @@
+﻿@typeparam ModelType where ModelType : IModel<ModelType>
+
+@if (Model != null)
+{
+    <MudForm Model="@Model" Validation="@(Model.ValidateValue())" ValidationDelay="0" @ref="@Form">
+        <MudCard>
+            <MudCardContent>
+                @ChildContent
+                @if (_busy)
+                {
+                    <MudProgressLinear Color="Color.Primary" Indeterminate="true" />
+                }
+                @if (Response != null)
+                {
+                    @if (Response.Success)
+                    {
+                        <MudAlert Severity="Severity.Success">Opslaan gelukt</MudAlert>
+                    }
+                    else if (Response.ErrorData != null && Response.ErrorData.Count > 0)
+                    {
+                        foreach (var error in Response.ErrorData)
+                        {
+                            <MudAlert Severity="Severity.Error">@error</MudAlert>
+                        }
+                    }
+                    else
+                    {
+                        <MudAlert Severity="Severity.Error">Opslaan mislukt</MudAlert>
+                    }
+                }
+            </MudCardContent>
+        </MudCard>
+        <MudCardActions>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" Disabled="@(_busy || (OnlyOnce && Response!=null && Response.Success))" OnClick="OnSave">@SaveText</MudButton>
+        </MudCardActions>
+    </MudForm>
+}
+else
+{
+    <MudProgressCircular Indeterminate="true" />
+}
+
+@code {
+    [Parameter]
+    public ModelType Model { get; set; }
+
+    [Parameter]
+    public Func<ModelType, Task<Response<ModelType, List<ValidationError>>>> OnSaveValidModel { get; set; }
+
+    public MudForm Form { get; set; }
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public string SaveText { get; set; } = "Opslaan";
+
+    [Parameter]
+    public bool OnlyOnce { get; set; }
+
+    private Response<ModelType, List<ValidationError>> Response { get; set; }
+
+    private bool _busy;
+
+    private async Task OnSave()
+    {
+        if (_busy || (OnlyOnce && Response != null && Response.Success))
+        {
+            return;
+        }
+        _busy = true;
+        Response = null;
+        await Form.Validate();
+        if (Form.IsValid)
+        {
+            Response = await OnSaveValidModel?.Invoke(Model);
+            if (Response.Success)
+            {
+                Model = Response.Data;
+            }
+        }
+        _busy = false;
+        StateHasChanged();
+    }
+}

@@ -25,6 +25,8 @@ using NuGet.Common;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Net.Http.Headers;
 using System.Net.Http.Headers;
+using static System.Formats.Asn1.AsnWriter;
+using Microsoft.AspNetCore.Rewrite;
 
 namespace AccuFin.Api.Controllers.Authentication
 {
@@ -36,13 +38,37 @@ namespace AccuFin.Api.Controllers.Authentication
         private readonly UserManager<AccuFinUser> _userManager;
         private readonly IEmailSender _emailSender;
         private readonly IConfiguration _configuration;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public AuthenticationController(UserManager<AccuFinUser> userManager, IdentityContext appDbContext, IEmailSender emailSender, IConfiguration configuration)
+        public AuthenticationController(UserManager<AccuFinUser> userManager,
+            IdentityContext appDbContext, IEmailSender emailSender,
+            IConfiguration configuration, RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _appDbContext = appDbContext;
             _emailSender = emailSender;
             _configuration = configuration;
+            _roleManager = roleManager;
+        }
+
+        [HttpGet("makeadmin")]
+        public async Task<ActionResult<bool>> GetCurrentUserAsync()
+        {
+            if (await _roleManager.RoleExistsAsync(Roles.Administrator) == false)
+            {
+                await _roleManager.CreateAsync(new IdentityRole(Roles.Administrator));
+            }
+            var user = await _userManager.FindByEmailAsync("hendrikdejonge@hotmail.com");
+            await AddToRole(user, Roles.Administrator);
+            return Ok(true);
+        }
+
+        private async Task AddToRole(AccuFinUser user, string role)
+        {
+            if (await _userManager.IsInRoleAsync(user, role) == false)
+            {
+                await _userManager.AddToRoleAsync(user, role);
+            }
         }
 
         [HttpGet]
@@ -62,12 +88,12 @@ namespace AccuFin.Api.Controllers.Authentication
 
             if (!AuthenticationHeaderValue.TryParse(authorization, out var headerValue))
             {
-                return BadRequest();
+                return BadRequest(new List<ValidationError>() { new ValidationError() { Description = "Unknown" } });
             }
             var scheme = headerValue.Scheme;
             if (scheme != "Bearer")
             {
-                return BadRequest();
+                return BadRequest(new List<ValidationError>() { new ValidationError() { Description = "Unknown" } });
             }
 
             var token = headerValue.Parameter;
@@ -76,23 +102,23 @@ namespace AccuFin.Api.Controllers.Authentication
             var jwtSecurityToken = handler.ReadJwtToken(token);
             if (jwtSecurityToken == null)
             {
-                return BadRequest();
+                return BadRequest(new List<ValidationError>() { new ValidationError() { Description = "Unknown" } });
             }
 
             var user = await _userManager.FindByEmailAsync(jwtSecurityToken.Claims.FirstOrDefault(b => b.Type == ClaimTypes.Email).Value);
             if (user == null)
             {
-                return Unauthorized();
+                return Unauthorized(new List<ValidationError>() { new ValidationError() { Description = "Unknown" } });
             }
             var clientId = jwtSecurityToken.Claims.FirstOrDefault(b => b.Type == "client_id")?.Value;
             if (string.IsNullOrWhiteSpace(clientId))
             {
-                return Unauthorized();
+                return Unauthorized(new List<ValidationError>() { new ValidationError() { Description = "Unknown" } });
             }
             var storedToken = await _appDbContext.RefreshTokens.FirstOrDefaultAsync(b => b.RefreshToken == refreshToken && b.UserId == user.Id && b.Revoked == false && b.ClientId == clientId);
             if (storedToken == null)
             {
-                return Unauthorized();
+                return Unauthorized(new List<ValidationError>() { new ValidationError() { Description = "Unknown" } });
             }
             storedToken.Revoked = true;
             await _appDbContext.SaveChangesAsync();
@@ -111,7 +137,6 @@ namespace AccuFin.Api.Controllers.Authentication
                 {
                     return BadRequest(new List<ValidationError>() { new ValidationError() { Code = "NOTVER", Description = "Email nog niet bevestigd" } });
                 }
-                //  var userRoles = await _userManager.GetRolesAsync(user);
 
                 TokenResult tokenModel = await GenerateTokenModel(user, model.ClientId);
 
@@ -128,11 +153,12 @@ namespace AccuFin.Api.Controllers.Authentication
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                     new Claim("client_id", clientId)
                 };
-
-            /*  foreach (var userRole in userRoles)
-              {
-                  authClaims.Add(new Claim(ClaimTypes.Role, userRole));
-              }*/
+            
+            var userRoles = await _userManager.GetRolesAsync(user);
+            foreach (var userRole in userRoles)
+            {
+                authClaims.Add(new Claim(ClaimTypes.Role, userRole));
+            }
 
             var token = GetToken(authClaims);
             var refreshToken = GenerateRefreshToken(user, clientId);

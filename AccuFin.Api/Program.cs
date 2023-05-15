@@ -17,6 +17,7 @@ using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Authentication;
 using AccuFin.Api.Client;
+using AccuFin.Api;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("IdentityContextConnection") ?? throw new InvalidOperationException("Connection string 'IdentityContextConnection' not found.");
@@ -42,9 +43,14 @@ builder.Services.AddDefaultIdentity<AccuFinUser>(options =>
     options.SignIn.RequireConfirmedEmail = true;
 })
     .AddDefaultTokenProviders()
+    .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<IdentityContext>()
-    .AddErrorDescriber<CustomIdentityErrorDescriber>();
-
+    .AddErrorDescriber<CustomIdentityErrorDescriber>()
+    ;
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy(Policy.Administrator, policy => policy.RequireRole(Roles.Administrator));
+});
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -89,6 +95,9 @@ using (var scope = app.Services.CreateScope())
     //databaseContextImkery?.Database.EnsureDeleted();
     databaseContextImkery?.Database.EnsureCreated();
     databaseContextImkery?.Database.Migrate();
+
+
+
 }
 
 app.Run();

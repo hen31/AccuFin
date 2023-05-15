@@ -1,0 +1,38 @@
+﻿@page "/administration"
+@page "/administration/{Id}"
+
+
+<EditModelComponent ModelType="AdministrationModel" Model="Model" OnSaveValidModel="OnSave" OnlyOnce="true">
+    <MudTextField Label="Naam"
+                  @bind-Value="Model.Name" For="@(() => Model.Name)" />
+    <MudTextField Label="Kvknummer" Class="mt-3"
+                  @bind-Value="Model.AdministrationRegistryCode" For="@(() =>Model.AdministrationRegistryCode)" />
+    <MudTextField Label="Telefoon" Class="mt-3"
+                  @bind-Value="Model.TelephoneNumber" For="@(() =>Model.TelephoneNumber)" />
+    <MudTextField Label="Email" Class="mt-3"
+                  @bind-Value="Model.EmailAdress" For="@(() =>Model.EmailAdress)" />
+</EditModelComponent>
+
+@code {
+    public AdministrationModel Model { get; set; }
+
+    [Inject]
+    public AdministrationClient AdministrationClient { get; set; }
+
+    [Parameter]
+    public Guid Id { get; set; }
+
+    public MudForm Form { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        if (Id == Guid.Empty)
+        {
+            Model = new AdministrationModel();
+        }
+    }
+
+    private async Task<Response<AdministrationModel, List<ValidationError>>> OnSave(AdministrationModel model)
+    {
+        return await AdministrationClient.AddAdministrationAsync(model);
+    }
+}

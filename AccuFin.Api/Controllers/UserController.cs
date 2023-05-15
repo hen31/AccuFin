@@ -18,7 +18,7 @@ namespace AccuFin.Api.Controllers
         {
             _userRepository = userRepository;
         }
-
+      
         [HttpGet]
         public async Task<ActionResult<CurrentUserModel>> GetCurrentUserAsync()
         {
@@ -34,6 +34,10 @@ namespace AccuFin.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<CurrentUserModel>> UpdateCurrentUserAsync([FromBody]CurrentUserModel userModel)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             string emailAdress = HttpContext.GetCurrentUserEmail();
             if (string.IsNullOrWhiteSpace(emailAdress))
             {

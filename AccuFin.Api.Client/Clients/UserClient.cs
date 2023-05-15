@@ -19,9 +19,9 @@ namespace AccuFin.Api.Client
             return DoGetRequest<CurrentUserModel>("");
         }
 
-        public Task<Response<CurrentUserModel>> UpdateCurrentUserAsync(CurrentUserModel currentUserModel)
+        public Task<Response<CurrentUserModel, List<ValidationError>>> UpdateCurrentUserAsync(CurrentUserModel currentUserModel)
         {
-            return DoPostRequest<CurrentUserModel>("", currentUserModel);
+            return DoPostRequest<CurrentUserModel, List<ValidationError>>("", currentUserModel);
         }
 
 

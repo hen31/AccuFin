@@ -9,6 +9,7 @@ namespace AccuFin.Api.Client
 
         }
         public HttpStatusCode StatusCode { get; set; }
+        public string ErrorMessage { get; set; }
         public bool Success { get; set; } = true;
     }
     public class Response<ResultType> : Response<ResultType, string>

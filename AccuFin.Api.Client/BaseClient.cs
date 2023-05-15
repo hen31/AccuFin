@@ -32,9 +32,13 @@ namespace AccuFin.Api.Client
             if (!httpReponse.IsSuccessStatusCode)
             {
                 var errorAsString = await httpReponse.Content.ReadAsStringAsync();
-                if (typeof(ErrorDataType) == typeof(string))
+                if (typeof(ErrorDataType) == typeof(string) )
                 {
                     return new ResponseType() { Success = false, ErrorData = (ErrorDataType)(object)errorAsString, StatusCode = httpReponse.StatusCode };
+                }
+                if(httpReponse.StatusCode != System.Net.HttpStatusCode.BadRequest)
+                {
+                    return new ResponseType() { Success = false, ErrorMessage = errorAsString, StatusCode = httpReponse.StatusCode };
                 }
                 return new ResponseType() { Success = false, ErrorData = JsonConvert.DeserializeObject<ErrorDataType>(errorAsString), StatusCode = httpReponse.StatusCode };
             }
@@ -81,7 +85,7 @@ namespace AccuFin.Api.Client
 
         private async Task AddAuthenticationHeader()
         {
-            string token = await ContextProvider.GetToken();
+            string token = await ContextProvider.GetTokenAsync();
             HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         }
 

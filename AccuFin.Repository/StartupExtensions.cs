@@ -12,6 +12,7 @@ namespace AccuFin.Repository
         public static void AddAccuFinRepositories(this IServiceCollection serviceCollection)
         {
             serviceCollection.AddScoped<UserRepository>();
+            serviceCollection.AddScoped<AdministrationRepository>();
         }
         
     }
