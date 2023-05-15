@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text;
 
 namespace AccuFin.Api.Models
@@ -21,8 +22,8 @@ namespace AccuFin.Api.Models
     {
         public CurrentUserModelValidator()
         {
-            RuleFor(b => b.Name).NotEmpty();
-            RuleFor(b => b.Telephone).NotEmpty();
+            RuleFor(b => b.Name).NotEmpty().WithName("Naam");
+            RuleFor(b => b.Telephone).NotEmpty().WithName("Telefoonnummer");
         }
     }
 }
