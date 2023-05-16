@@ -23,7 +23,40 @@ namespace AccuFin.Api.Controllers
             _userRepository = userRepository;
             _administrationRepository = administrationRepository;
         }
+        [HttpGet("{id}")]
+        [Authorize(Policy = Policy.Administrator)]
+        public async Task<ActionResult<AdministrationModel>> GetItemByIdAsync(Guid id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var item = await _administrationRepository.GetItemByIdAsync(id);
+            if (item == null)
+            {
+                return BadRequest("Niet gevonden");
+            }
+            //parse orderby;
+            return Ok(item);
+        }
 
+        [HttpPost("{id}")]
+        [Authorize(Policy = Policy.Administrator)]
+        public async Task<ActionResult<AdministrationModel>> EditItemById(Guid id, [FromBody] AdministrationModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var item = await _administrationRepository.EditItemAsync(id, model);
+            //parse orderby;
+            if (item == null)
+            {
+                return BadRequest("Niet gevonden");
+            }
+            //parse orderby;
+            return Ok(item);
+        }
 
         [HttpGet]
         [Authorize(Policy = Policy.Administrator)]

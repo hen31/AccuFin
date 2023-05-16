@@ -1,20 +1,22 @@
 ﻿@page "/administration"
-@page "/administration/{Id}"
+@page "/administration/{Id:guid}"
 
 
-<EditModelComponent ModelType="AdministrationModel" Model="Model" OnSaveValidModel="OnSave" OnlyOnce="true">
+<EditModelComponent ModelType="AdministrationModel"
+                    OnGetModel="GetModelAsync"
+                    OnSaveValidModel="OnSave"
+                    OnlyOnce="true">
     <MudTextField Label="Naam"
-                  @bind-Value="Model.Name" For="@(() => Model.Name)" />
+                  @bind-Value="context.Name" For="@(() => context.Name)" />
     <MudTextField Label="Kvknummer" Class="mt-3"
-                  @bind-Value="Model.AdministrationRegistryCode" For="@(() =>Model.AdministrationRegistryCode)" />
+                  @bind-Value="context.AdministrationRegistryCode" For="@(() =>context.AdministrationRegistryCode)" />
     <MudTextField Label="Telefoon" Class="mt-3"
-                  @bind-Value="Model.TelephoneNumber" For="@(() =>Model.TelephoneNumber)" />
+                  @bind-Value="context.TelephoneNumber" For="@(() =>context.TelephoneNumber)" />
     <MudTextField Label="Email" Class="mt-3"
-                  @bind-Value="Model.EmailAdress" For="@(() =>Model.EmailAdress)" />
+                  @bind-Value="context.EmailAdress" For="@(() =>context.EmailAdress)" />
 </EditModelComponent>
 
 @code {
-    public AdministrationModel Model { get; set; }
 
     [Inject]
     public AdministrationClient AdministrationClient { get; set; }
@@ -23,16 +25,36 @@
     public Guid Id { get; set; }
 
     public MudForm Form { get; set; }
-    protected override async Task OnInitializedAsync()
+
+    public async Task<InitializeEditFormResult<AdministrationModel>> GetModelAsync()
     {
         if (Id == Guid.Empty)
         {
-            Model = new AdministrationModel();
+            return new InitializeEditFormResult<AdministrationModel>(new AdministrationModel(), null);
+        }
+        else
+        {
+            var response = await AdministrationClient.GetAdministrationByIdAsync(Id);
+            if (response.Success)
+            {
+                return new InitializeEditFormResult<AdministrationModel>(response.Data, response);
+            }
+            else
+            {
+                return new InitializeEditFormResult<AdministrationModel>(null, response);
+            }
         }
     }
 
     private async Task<Response<AdministrationModel, List<ValidationError>>> OnSave(AdministrationModel model)
     {
-        return await AdministrationClient.AddAdministrationAsync(model);
+        if (Id == Guid.Empty)
+        {
+            return await AdministrationClient.AddAdministrationAsync(model);
+        }
+        else
+        {
+            return await AdministrationClient.UpdateAdministrationAsync(model);
+        }
     }
 }

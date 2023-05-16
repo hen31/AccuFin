@@ -2,13 +2,18 @@
 
 
 
-<CollectionGridComponent T="AdministrationCollectionItem" 
-    CollectionSource="@AdministrationClient"
-    Title="Administraties" 
-    AddHref="/administration">
+<CollectionGridComponent T="AdministrationCollectionItem"
+                         CollectionSource="@AdministrationClient"
+                         Title="Administraties"
+                         AddHref="/administration">
     <Columns>
         <PropertyColumn Property="x => x.Name" Title="Naam" Sortable="true" />
-        <PropertyColumn Property="x => x.AdministrationRegistryCode" Title="Kvk" Sortable="true"/>
+        <PropertyColumn Property="x => x.AdministrationRegistryCode" Title="Kvk" Sortable="true" />
+        <TemplateColumn Resizable="false" CellStyle="width:64px;" Sortable="false">
+            <CellTemplate>
+                <MudIconButton Icon="@Icons.Material.Filled.Edit" Href="@("/administration/" +context.Item.Id)" />
+            </CellTemplate>
+        </TemplateColumn>
     </Columns>
 </CollectionGridComponent>
 
@@ -17,6 +22,6 @@
 
     [Inject]
     public AdministrationClient AdministrationClient { get; set; }
-  
+
 
 }

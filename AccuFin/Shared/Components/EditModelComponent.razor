@@ -1,47 +1,54 @@
-﻿@typeparam ModelType where ModelType : IModel<ModelType>
+﻿@typeparam ModelType where ModelType : IModel<ModelType>, new()
 
-@if (Model != null)
-{
-    <MudForm Model="@Model" Validation="@(Model.ValidateValue())" ValidationDelay="0" @ref="@Form">
-        <MudCard>
-            <MudCardContent>
-                @ChildContent
-                @if (_busy)
+<MudForm Model="@Model"
+         Validation="@(Model?.ValidateValue())"
+         ValidationDelay="0"
+         ReadOnly="ReadOnly"
+         @ref="@Form">
+    <MudCard>
+        <MudCardContent>
+            @if (Model != null)
+            {
+                @ChildContent.Invoke(Model)
+            }
+            else
+            {
+                @ChildContent.Invoke(new ModelType())
+            }
+            @if (_busy)
+            {
+                <MudProgressLinear Color="Color.Primary" Indeterminate="true" />
+            }
+            @if (SaveResponse != null)
+            {
+                @if (SaveResponse.Success)
                 {
-                    <MudProgressLinear Color="Color.Primary" Indeterminate="true" />
+                    <MudAlert Severity="Severity.Success">Opslaan gelukt</MudAlert>
                 }
-                @if (Response != null)
+                else if (SaveResponse.ErrorData != null && SaveResponse.ErrorData.Count > 0)
                 {
-                    @if (Response.Success)
+                    foreach (var error in SaveResponse.ErrorData)
                     {
-                        <MudAlert Severity="Severity.Success">Opslaan gelukt</MudAlert>
-                    }
-                    else if (Response.ErrorData != null && Response.ErrorData.Count > 0)
-                    {
-                        foreach (var error in Response.ErrorData)
-                        {
-                            <MudAlert Severity="Severity.Error">@error</MudAlert>
-                        }
-                    }
-                    else
-                    {
-                        <MudAlert Severity="Severity.Error">Opslaan mislukt</MudAlert>
+                        <MudAlert Severity="Severity.Error">@error</MudAlert>
                     }
                 }
-            </MudCardContent>
-        </MudCard>
-        <MudCardActions>
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" Disabled="@(_busy || (OnlyOnce && Response!=null && Response.Success))" OnClick="OnSave">@SaveText</MudButton>
-        </MudCardActions>
-    </MudForm>
-}
-else
-{
-    <MudProgressCircular Indeterminate="true" />
-}
+                else
+                {
+                    <MudAlert Severity="Severity.Error">Opslaan mislukt</MudAlert>
+                }
+            }
+            @if (GetModelResponse != null && !GetModelResponse.Success)
+            {
+                <MudAlert Severity="Severity.Error">Ophalen mislukt <MudLink OnClick="LoadModelAsync">Opnieuw proberen</MudLink> </MudAlert>
+            }
+        </MudCardContent>
+    </MudCard>
+    <MudCardActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" Disabled="@(ReadOnly || (OnlyOnce && SaveResponse!=null && SaveResponse.Success))" OnClick="OnSave">@SaveText</MudButton>
+    </MudCardActions>
+</MudForm>
 
 @code {
-    [Parameter]
     public ModelType Model { get; set; }
 
     [Parameter]
@@ -49,7 +56,7 @@ else
 
     public MudForm Form { get; set; }
     [Parameter]
-    public RenderFragment ChildContent { get; set; }
+    public RenderFragment<ModelType> ChildContent { get; set; }
 
     [Parameter]
     public string SaveText { get; set; } = "Opslaan";
@@ -57,28 +64,56 @@ else
     [Parameter]
     public bool OnlyOnce { get; set; }
 
-    private Response<ModelType, List<ValidationError>> Response { get; set; }
+    [Parameter]
+    public Func<Task<InitializeEditFormResult<ModelType>>> OnGetModel { get; set; }
+    [Parameter]
+    public Response<ModelType> GetModelResponse { get; set; }
+
+    private Response<ModelType, List<ValidationError>> SaveResponse { get; set; }
 
     private bool _busy;
+    private bool _ready = false;
+    private bool ReadOnly => _busy || !_ready;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadModelAsync();
+    }
+
+    public async Task LoadModelAsync()
+    {
+        _busy = true;
+        var modelResult = await OnGetModel?.Invoke();
+        Model = modelResult.Model;
+        GetModelResponse = modelResult.Response;
+        if (Model != null)
+        {
+            _ready = true;
+        }
+        _busy = false;
+    }
 
     private async Task OnSave()
     {
-        if (_busy || (OnlyOnce && Response != null && Response.Success))
+        if (_busy || (OnlyOnce && SaveResponse != null && SaveResponse.Success))
         {
             return;
         }
         _busy = true;
-        Response = null;
+        SaveResponse = null;
         await Form.Validate();
         if (Form.IsValid)
         {
-            Response = await OnSaveValidModel?.Invoke(Model);
-            if (Response.Success)
+            SaveResponse = await OnSaveValidModel?.Invoke(Model);
+            if (SaveResponse.Success)
             {
-                Model = Response.Data;
+                Model = SaveResponse.Data;
+                _ready = true;
             }
         }
         _busy = false;
         StateHasChanged();
+
+
     }
 }

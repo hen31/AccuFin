@@ -18,7 +18,16 @@ namespace AccuFin.Api.Client
         {
             return DoGetRequest<FinCollection<AdministrationCollectionItem>, List<ValidationError>>(GenerateCollectionParametersUrl(page, pageSize, orderBy));
         }
+        public Task<Response<AdministrationModel>> GetAdministrationByIdAsync(Guid id)
+        {
+            return DoGetRequest<AdministrationModel>($"/{id}");
+        }
 
+
+        public Task<Response<AdministrationModel, List<ValidationError>>> UpdateAdministrationAsync(AdministrationModel administration)
+        {
+            return DoPostRequest<AdministrationModel, List<ValidationError>>($"/{administration.Id}", administration);
+        }
         private static string GenerateCollectionParametersUrl(int page, int pageSize, string[] orderBy)
         {
             string parametersUrl = $"?page={page}&pageSize={pageSize}";

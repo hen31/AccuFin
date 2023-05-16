@@ -1,12 +1,12 @@
 ﻿@page "/account"
 
-<EditModelComponent ModelType="CurrentUserModel" Model="Model" OnSaveValidModel="OnSave">
+<EditModelComponent ModelType="CurrentUserModel" OnSaveValidModel="OnSave" OnGetModel="GetModelAsync">
     <MudTextField Label="Naam"
-                  @bind-Value="Model.Name" For="@(() => Model.Name)" />
+                  @bind-Value="context.Name" For="@(() => context.Name)" />
     <MudTextField Label="Telefoon" Class="mt-3"
-                  @bind-Value="Model.Telephone" For="@(() =>Model.Telephone)" />
+                  @bind-Value="context.Telephone" For="@(() =>context.Telephone)" />
     <MudTextField Label="Mobiel" Class="mt-3"
-                  @bind-Value="Model.MobileNumber" For="@(() =>Model.MobileNumber)" />
+                  @bind-Value="context.MobileNumber" For="@(() =>context.MobileNumber)" />
 </EditModelComponent>
 
 
@@ -15,12 +15,13 @@
     [Inject]
     public UserClient UserClient { get; set; }
 
-    public CurrentUserModel Model { get; set; }
-
-    public MudForm Form { get; set; }
     protected override async Task OnInitializedAsync()
     {
-        Model = (await UserClient.GetCurrentUserAsync()).Data;
+    }
+    public async Task<InitializeEditFormResult<CurrentUserModel>> GetModelAsync()
+    {
+        var response = await UserClient.GetCurrentUserAsync();
+        return new InitializeEditFormResult<CurrentUserModel>(response.Data, response);
     }
 
     private async Task<Response<CurrentUserModel, List<ValidationError>>> OnSave(CurrentUserModel model)
