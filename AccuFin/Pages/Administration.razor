@@ -4,6 +4,7 @@
 
 <EditModelComponent ModelType="AdministrationModel"
                     OnGetModel="GetModelAsync"
+                    OnDeleteModel="DeleteModelAsync"
                     OnSaveValidModel="OnSave"
                     OnlyOnce="true">
     <MudTextField Label="Naam"
@@ -44,6 +45,11 @@
                 return new InitializeEditFormResult<AdministrationModel>(null, response);
             }
         }
+    }
+
+    private async Task<Response<AdministrationModel>> DeleteModelAsync(AdministrationModel model)
+    {
+        return new Response<AdministrationModel>();
     }
 
     private async Task<Response<AdministrationModel, List<ValidationError>>> OnSave(AdministrationModel model)

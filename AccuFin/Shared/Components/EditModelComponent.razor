@@ -44,6 +44,12 @@
         </MudCardContent>
     </MudCard>
     <MudCardActions>
+        @if (OnDeleteModel != null && GetModelResponse != null)
+        {
+            <MudButton Variant="Variant.Filled" Color="Color.Error"
+                   Disabled="@(ReadOnly)"
+                   OnClick="OnDelete">@DeleteText</MudButton>
+        }
         <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" Disabled="@(ReadOnly || (OnlyOnce && SaveResponse!=null && SaveResponse.Success))" OnClick="OnSave">@SaveText</MudButton>
     </MudCardActions>
 </MudForm>
@@ -54,13 +60,18 @@
     [Parameter]
     public Func<ModelType, Task<Response<ModelType, List<ValidationError>>>> OnSaveValidModel { get; set; }
 
+    [Parameter]
+    public Func<ModelType, Task<Response<ModelType>>> OnDeleteModel { get; set; }
+
+
     public MudForm Form { get; set; }
     [Parameter]
     public RenderFragment<ModelType> ChildContent { get; set; }
 
     [Parameter]
     public string SaveText { get; set; } = "Opslaan";
-
+    [Parameter]
+    public string DeleteText { get; set; } = "Verwijderen";
     [Parameter]
     public bool OnlyOnce { get; set; }
 
@@ -70,6 +81,9 @@
     public Response<ModelType> GetModelResponse { get; set; }
 
     private Response<ModelType, List<ValidationError>> SaveResponse { get; set; }
+
+
+    private Response<ModelType> DeleteResponse { get; set; }
 
     private bool _busy;
     private bool _ready = false;
@@ -116,4 +130,28 @@
 
 
     }
+    private async Task OnDelete()
+    {
+        if (_busy)
+        {
+            return;
+        }
+        _busy = true;
+        //Ask question with dialog sure delete?
+
+        DeleteResponse = null;
+        DeleteResponse = await OnDeleteModel?.Invoke(Model);//Create real delete
+        if (DeleteResponse.Success)
+        {
+            Model = DeleteResponse.Data;
+            _ready = true;
+        }
+
+        _busy = false;
+        StateHasChanged();
+
+
+    }
+
+
 }
