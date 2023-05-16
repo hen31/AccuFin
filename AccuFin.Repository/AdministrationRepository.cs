@@ -20,7 +20,7 @@ namespace AccuFin.Repository
             EntityRepository<Administration, Guid> administrationRepository = new EntityRepository<Administration, Guid>(DatabaseContext);
             var entity = Map(administration, new Administration());
             await administrationRepository.Add(entity);
-            await DatabaseContext.SaveChangesAsync(); 
+            await DatabaseContext.SaveChangesAsync();
             administration = Map(entity, administration);
             return administration;
         }
@@ -43,14 +43,14 @@ namespace AccuFin.Repository
             return administration;
         }
 
-        public async Task<FinCollection<AdministrationCollectionItem>> GetCollectionAsync(int page, int pageSize)
+        public async Task<FinCollection<AdministrationCollectionItem>> GetCollectionAsync(int page, int pageSize, string[] orderBy)
         {
             EntityRepository<Administration, Guid> administrationRepository = new EntityRepository<Administration, Guid>(DatabaseContext);
-            return (await administrationRepository.GetCollectionAsync(page, pageSize, b => true, b => new AdministrationCollectionItem()
+            return (await administrationRepository.GetCollectionAsync(page, pageSize, orderBy, b => true, b => new AdministrationCollectionItem()
             {
                 Id = b.Id,
                 Name = b.Name,
-                Kvk = b.AdministrationRegistryCode
+                AdministrationRegistryCode = b.AdministrationRegistryCode
             }));
         }
 

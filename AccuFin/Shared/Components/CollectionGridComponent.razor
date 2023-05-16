@@ -4,7 +4,7 @@
 <CascadingValue IsFixed="true" Value="_grid">@Columns</CascadingValue>
 <MudDataGrid @ref="_grid" T="T"
              ServerData="@(new Func<GridState<T>, Task<GridData<T>>>(ServerReload))"
-             SortMode="SortMode.None" Filterable="false" Loading="true">
+             SortMode="SortMode.Multiple" Filterable="false" Loading="true">
     <LoadingContent>
         <MudProgressCircular Indeterminate="true" />
     </LoadingContent>
@@ -40,7 +40,7 @@
 
     private async Task<GridData<T>> ServerReload(GridState<T> state)
     {
-        var response = await CollectionSource.GetCollectionAsync(state.Page + 1, state.PageSize);
+        var response = await CollectionSource.GetCollectionAsync(state.Page + 1, state.PageSize, state.SortDefinitions.OrderBy(b => b.Index).Select(b => b.SortBy + ";" + b.Descending).ToArray());
         var gridData = new GridData<T>();
         if (response.Success)
         {

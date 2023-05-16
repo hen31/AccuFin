@@ -29,11 +29,39 @@ namespace AccuFin.Repository
             return await DbSet.ToListAsync();
         }
 
-        public async Task<FinCollection<ModelType>> GetCollectionAsync<ModelType>(int page, int pageSize, Expression<Func<T, bool>> where, Func<T, ModelType> convert)
+        public async Task<FinCollection<ModelType>> GetCollectionAsync<ModelType>(int page, int pageSize, string[] orderBy, Expression<Func<T, bool>> where, Func<T, ModelType> convert)
         {
             var collection = new FinCollection<ModelType>();
-            var fullSet =  DbSet.AsQueryable()
+            var fullSet = DbSet.AsQueryable()
                 .Where(where);
+            if (orderBy?.Length > 0)
+            {
+                for (int i = 0; i < orderBy.Length; i++)
+                {
+
+                    var parts = orderBy[i].Split(';');
+                    if (parts.Length != 2)
+                    {
+                        continue;
+                    }
+                    if (!bool.TryParse(parts[1], out bool descending))
+                    {
+                        continue;
+                    }
+                    if (i == 0)
+                    {
+                        fullSet = fullSet.OrderBy(parts[0], descending);
+                    }
+                    else
+                    {
+                        fullSet = fullSet.ThenBy(parts[0], descending);
+                    }
+                }
+            }
+            else
+            {
+                fullSet = fullSet.OrderBy(b => b.Id);
+            }
             var set = await
                 fullSet.Skip((page - 1) * pageSize)
                 .Take(pageSize)

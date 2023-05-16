@@ -14,9 +14,19 @@ namespace AccuFin.Api.Client
             Area = "administration";
         }
 
-        public Task<Response<FinCollection<AdministrationCollectionItem>, List<ValidationError>>> GetCollectionAsync(int page, int pageSize)
+        public Task<Response<FinCollection<AdministrationCollectionItem>, List<ValidationError>>> GetCollectionAsync(int page, int pageSize, string[] orderBy)
         {
-            return DoGetRequest<FinCollection<AdministrationCollectionItem>, List<ValidationError>>($"?page={page}&pageSize={pageSize}");
+            return DoGetRequest<FinCollection<AdministrationCollectionItem>, List<ValidationError>>(GenerateCollectionParametersUrl(page, pageSize, orderBy));
+        }
+
+        private static string GenerateCollectionParametersUrl(int page, int pageSize, string[] orderBy)
+        {
+            string parametersUrl = $"?page={page}&pageSize={pageSize}";
+            if (orderBy == null || orderBy.Length == 0)
+            {
+                return parametersUrl;
+            }
+            return parametersUrl + $"&orderby={string.Join(',', orderBy)}";
         }
 
         public Task<Response<AdministrationModel, List<ValidationError>>> AddAdministrationAsync(AdministrationModel administration)

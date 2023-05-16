@@ -8,7 +8,7 @@ namespace AccuFin.Api.Models
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
-        public string Kvk { get; set; }
+        public string AdministrationRegistryCode { get; set; }
         
     }
 }

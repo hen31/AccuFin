@@ -27,13 +27,14 @@ namespace AccuFin.Api.Controllers
 
         [HttpGet]
         [Authorize(Policy = Policy.Administrator)]
-        public async Task<ActionResult<FinCollection<AdministrationCollectionItem>>> GetCollectionAsync([FromQuery] int page, [FromQuery] int pageSize)
+        public async Task<ActionResult<FinCollection<AdministrationCollectionItem>>> GetCollectionAsync([FromQuery] int page, [FromQuery] int pageSize, [FromQuery] string orderBy = null)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            return await _administrationRepository.GetCollectionAsync(page, pageSize);
+            //parse orderby;
+            return await _administrationRepository.GetCollectionAsync(page, pageSize, orderBy?.Split(','));
         }
 
         [HttpPost]
