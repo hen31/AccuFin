@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 
 namespace AccuFin.Api.Client
 {
-    public class AdministrationClient : BaseClient
+    public class AdministrationClient : BaseClient, ICollectionSourceClient<AdministrationCollectionItem>
     {
         public AdministrationClient(HttpClient httpClient, IClientAuthentication contextProvider) : base(httpClient, contextProvider)
         {
             Area = "administration";
         }
 
-        public Task<Response<FinCollection<AdministrationCollectionItem>, List<ValidationError>>> GetAdministrations(int page, int pageSize)
+        public Task<Response<FinCollection<AdministrationCollectionItem>, List<ValidationError>>> GetCollectionAsync(int page, int pageSize)
         {
             return DoGetRequest<FinCollection<AdministrationCollectionItem>, List<ValidationError>>($"?page={page}&pageSize={pageSize}");
         }

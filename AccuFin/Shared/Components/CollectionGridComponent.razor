@@ -1,0 +1,53 @@
+﻿@typeparam T
+@attribute [CascadingTypeParameter(nameof(T))]
+
+<CascadingValue IsFixed="true" Value="_grid">@Columns</CascadingValue>
+<MudDataGrid @ref="_grid" T="T"
+             ServerData="@(new Func<GridState<T>, Task<GridData<T>>>(ServerReload))"
+             SortMode="SortMode.None" Filterable="false" Loading="true">
+    <LoadingContent>
+        <MudProgressCircular Indeterminate="true" />
+    </LoadingContent>
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">@Title</MudText>
+        <MudSpacer />
+        <MudIconButton Icon="@Icons.Material.Filled.Refresh" OnClick="_grid.ReloadServerData"></MudIconButton>
+        @if (!string.IsNullOrWhiteSpace(AddHref))
+        {
+            <MudButton Href="@AddHref">Toevoegen</MudButton>
+        }
+    </ToolBarContent>
+    <Columns>
+        @Columns
+    </Columns>
+    <PagerContent>
+        <MudDataGridPager T="T" PageSizeOptions="@(new int[]{5, 10, 15, 20})" />
+    </PagerContent>
+</MudDataGrid>
+
+@code {
+    [Parameter]
+    public ICollectionSourceClient<T> CollectionSource { get; set; }
+
+    private MudDataGrid<T> _grid;
+
+    [Parameter] public RenderFragment? Columns { get; set; }
+    [Parameter]
+    public string Title { get; set; }
+    [Parameter]
+    public string AddHref { get; set; }
+
+
+    private async Task<GridData<T>> ServerReload(GridState<T> state)
+    {
+        var response = await CollectionSource.GetCollectionAsync(state.Page + 1, state.PageSize);
+        var gridData = new GridData<T>();
+        if (response.Success)
+        {
+            gridData.TotalItems = response.Data.Count;
+            gridData.Items = response.Data.Items;
+        }
+        return gridData;
+    }
+
+}

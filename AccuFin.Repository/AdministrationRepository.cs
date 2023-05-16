@@ -49,7 +49,8 @@ namespace AccuFin.Repository
             return (await administrationRepository.GetCollectionAsync(page, pageSize, b => true, b => new AdministrationCollectionItem()
             {
                 Id = b.Id,
-                Name = b.Name
+                Name = b.Name,
+                Kvk = b.AdministrationRegistryCode
             }));
         }
 
