@@ -42,6 +42,11 @@ namespace AccuFin.Api.Client
         {
             return DoPostRequest<AdministrationModel, List<ValidationError>>("", administration);
         }
+
+        public Task<Response<bool>> DeleteAdministrationAsync(Guid id)
+        {
+            return DoPostRequest<bool>($"/delete/{id}");
+        }
     }
 }
 

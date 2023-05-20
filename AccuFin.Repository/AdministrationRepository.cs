@@ -54,5 +54,16 @@ namespace AccuFin.Repository
             await DatabaseContext.SaveChangesAsync();
             return item.Map();
         }
+
+        public async Task<bool> DeleteItemAsync(Guid id)
+        {
+            EntityRepository<Administration, Guid> administrationRepository = new EntityRepository<Administration, Guid>(DatabaseContext);
+            var item = await administrationRepository.GetById(id);
+            if (item == null) { return false; }
+            administrationRepository.Delete(item);
+            await DatabaseContext.SaveChangesAsync();
+            return true;
+        }
+
     }
 }

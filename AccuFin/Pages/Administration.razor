@@ -2,9 +2,12 @@
 @page "/administration/{Id:guid}"
 
 
-<EditModelComponent ModelType="AdministrationModel"
+<EditModelComponent
+                    ModelType="AdministrationModel"
                     OnGetModel="GetModelAsync"
                     OnDeleteModel="DeleteModelAsync"
+                    OnGetObjectToDeleteDescription="@((model)=> model.Name)"
+                    NavigateToAfterDelete="/administrations"
                     OnSaveValidModel="OnSave"
                     OnlyOnce="true">
     <MudTextField Label="Naam"
@@ -18,7 +21,6 @@
 </EditModelComponent>
 
 @code {
-
     [Inject]
     public AdministrationClient AdministrationClient { get; set; }
 
@@ -47,9 +49,9 @@
         }
     }
 
-    private async Task<Response<AdministrationModel>> DeleteModelAsync(AdministrationModel model)
+    private async Task<Response<bool>> DeleteModelAsync(AdministrationModel model)
     {
-        return new Response<AdministrationModel>();
+        return await AdministrationClient.DeleteAdministrationAsync(model.Id);
     }
 
     private async Task<Response<AdministrationModel, List<ValidationError>>> OnSave(AdministrationModel model)

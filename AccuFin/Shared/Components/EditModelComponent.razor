@@ -4,7 +4,7 @@
          Validation="@(Model?.ValidateValue())"
          ValidationDelay="0"
          ReadOnly="ReadOnly"
-         @ref="@Form">
+@ref="@Form">
     <MudCard>
         <MudCardContent>
             @if (Model != null)
@@ -37,6 +37,10 @@
                     <MudAlert Severity="Severity.Error">Opslaan mislukt</MudAlert>
                 }
             }
+            @if (DeleteResponse !=null && (!DeleteResponse.Success || !DeleteResponse.Data))
+            {
+                <MudAlert Severity="Severity.Error">Verwijderen mislukt</MudAlert>
+            }
             @if (GetModelResponse != null && !GetModelResponse.Success)
             {
                 <MudAlert Severity="Severity.Error">Ophalen mislukt <MudLink OnClick="LoadModelAsync">Opnieuw proberen</MudLink> </MudAlert>
@@ -47,21 +51,27 @@
         @if (OnDeleteModel != null && GetModelResponse != null)
         {
             <MudButton Variant="Variant.Filled" Color="Color.Error"
-                   Disabled="@(ReadOnly)"
-                   OnClick="OnDelete">@DeleteText</MudButton>
+                       Disabled="@(ReadOnly)"
+                       OnClick="OnDelete">@DeleteText</MudButton>
         }
         <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" Disabled="@(ReadOnly || (OnlyOnce && SaveResponse!=null && SaveResponse.Success))" OnClick="OnSave">@SaveText</MudButton>
     </MudCardActions>
 </MudForm>
 
+
+
 @code {
     public ModelType Model { get; set; }
+    [Inject]
+    public NavigationManager NavigationManager { get; set; }
+    [Inject]
+    public IDialogService DialogService { get; set; }
 
     [Parameter]
     public Func<ModelType, Task<Response<ModelType, List<ValidationError>>>> OnSaveValidModel { get; set; }
 
     [Parameter]
-    public Func<ModelType, Task<Response<ModelType>>> OnDeleteModel { get; set; }
+    public Func<ModelType, Task<Response<bool>>> OnDeleteModel { get; set; }
 
 
     public MudForm Form { get; set; }
@@ -73,6 +83,11 @@
     [Parameter]
     public string DeleteText { get; set; } = "Verwijderen";
     [Parameter]
+    public string NavigateToAfterDelete { get; set; }
+    [Parameter]
+    public Func<ModelType, string> OnGetObjectToDeleteDescription { get; set; }
+
+    [Parameter]
     public bool OnlyOnce { get; set; }
 
     [Parameter]
@@ -83,7 +98,7 @@
     private Response<ModelType, List<ValidationError>> SaveResponse { get; set; }
 
 
-    private Response<ModelType> DeleteResponse { get; set; }
+    private Response<bool> DeleteResponse { get; set; }
 
     private bool _busy;
     private bool _ready = false;
@@ -137,16 +152,30 @@
             return;
         }
         _busy = true;
-        //Ask question with dialog sure delete?
-
-        DeleteResponse = null;
-        DeleteResponse = await OnDeleteModel?.Invoke(Model);//Create real delete
-        if (DeleteResponse.Success)
+        var parameters = new DialogParameters();
+        if (OnGetObjectToDeleteDescription == null)
         {
-            Model = DeleteResponse.Data;
-            _ready = true;
+            parameters.Add("ContentText", "Weet u zeker dat u het wilt verwijderen?");
         }
+        else
+        {
+            parameters.Add("ContentText", $"Weet u zeker dat u '{OnGetObjectToDeleteDescription.Invoke(Model)}' wilt verwijderen?");
+        }
+        parameters.Add("ButtonText", "Verwijderen");
+        parameters.Add("Color", Color.Error);
 
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+        var dialog = await DialogService.ShowAsync<DeleteDialog>("Verwijderen", parameters, options);
+        if (!(await dialog.Result).Canceled)
+        {
+            DeleteResponse = null;
+            DeleteResponse = await OnDeleteModel?.Invoke(Model);//Create real delete
+            if (DeleteResponse.Success)
+            {
+                _ready = true;
+                NavigationManager.NavigateTo(NavigateToAfterDelete);
+            }
+        }
         _busy = false;
         StateHasChanged();
 

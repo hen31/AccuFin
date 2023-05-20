@@ -57,6 +57,24 @@ namespace AccuFin.Api.Controllers
             //parse orderby;
             return Ok(item);
         }
+        [HttpPost("delete/{id}")]
+        [Authorize(Policy = Policy.Administrator)]
+        public async Task<ActionResult<AdministrationModel>> EditItemById(Guid id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var isDeleted = await _administrationRepository.DeleteItemAsync(id);
+            //parse orderby;
+            if (isDeleted == false)
+            {
+                return BadRequest("Niet gevonden");
+            }
+            //parse orderby;
+            return Ok(isDeleted);
+        }
+        
 
         [HttpGet]
         [Authorize(Policy = Policy.Administrator)]
