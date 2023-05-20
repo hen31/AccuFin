@@ -170,7 +170,7 @@
         {
             DeleteResponse = null;
             DeleteResponse = await OnDeleteModel?.Invoke(Model);//Create real delete
-            if (DeleteResponse.Success)
+            if (DeleteResponse.Success && DeleteResponse.Data)
             {
                 _ready = true;
                 NavigationManager.NavigateTo(NavigateToAfterDelete);

@@ -4,6 +4,7 @@
 <CascadingValue IsFixed="true" Value="_grid">@Columns</CascadingValue>
 <MudDataGrid @ref="_grid" T="T"
              ServerData="@(new Func<GridState<T>, Task<GridData<T>>>(ServerReload))"
+             RowsPerPage="RowsPerPage" CurrentPage="Page"
              SortMode="SortMode.Multiple" Filterable="false" Loading="true">
     <LoadingContent>
         <MudProgressCircular Indeterminate="true" />
@@ -21,31 +22,80 @@
         @Columns
     </Columns>
     <PagerContent>
-        <MudDataGridPager T="T" PageSizeOptions="@(new int[]{5, 10, 15, 20})" />
+        <MudDataGridPager T="T" RowsPerPageString="Hoeveel per pagina" PageSizeOptions="@(new int[]{5, 10, 15, 20})" />
     </PagerContent>
 </MudDataGrid>
 
 @code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (NavigationManager.TryGetQueryString<int>("page", out int page) && NavigationManager.TryGetQueryString<int>("rowsperpage", out int rowsPerPage))
+            {
+                RowsPerPage = rowsPerPage;
+                Page = page;
+                if (NavigationManager.TryGetQueryString<string>("sort", out string sortDefinition))
+                {
+                    string[] items = sortDefinition.Split(',');
+                    int i = 0;
+                    foreach (var item in items)
+                    {
+                        string[] parts = item.Split(';');
+                        if (i == 0)
+                        {
+                            await _grid.SetSortAsync(parts[0], bool.Parse(parts[1]) ? SortDirection.Descending : SortDirection.Descending, null);
+                        }
+                        else
+                        {
+                            await _grid.ExtendSortAsync(parts[0], bool.Parse(parts[1]) ? SortDirection.Descending : SortDirection.Descending, null);
+                        }
+                        i++;
+                    }
+
+                }
+            }
+        }
+    }
     [Parameter]
     public ICollectionSourceClient<T> CollectionSource { get; set; }
 
     private MudDataGrid<T> _grid;
 
-    [Parameter] public RenderFragment? Columns { get; set; }
+    [Parameter]
+    public RenderFragment? Columns { get; set; }
     [Parameter]
     public string Title { get; set; }
     [Parameter]
     public string AddHref { get; set; }
 
+    public int RowsPerPage { get; set; } = 5;
+    public int Page { get; set; } = 0;
+    [Parameter]
+    public bool RewriteUrl { get; set; }
+    [Inject]
+    public NavigationManager NavigationManager { get; set; }
 
     private async Task<GridData<T>> ServerReload(GridState<T> state)
     {
-        var response = await CollectionSource.GetCollectionAsync(state.Page + 1, state.PageSize, state.SortDefinitions.OrderBy(b => b.Index).Select(b => b.SortBy + ";" + b.Descending).ToArray());
+        var orderByFields = state.SortDefinitions.OrderBy(b => b.Index).Select(b => b.SortBy + ";" + b.Descending).ToArray();
+        var response = await CollectionSource.GetCollectionAsync(state.Page + 1, state.PageSize, orderByFields);
         var gridData = new GridData<T>();
         if (response.Success)
         {
             gridData.TotalItems = response.Data.Count;
             gridData.Items = response.Data.Items;
+        }
+        if (RewriteUrl)
+        {
+            if (orderByFields.Length == 0)
+            {
+                NavigationManager.NavigateTo(new Uri(NavigationManager.Uri).GetLeftPart(UriPartial.Path) + $"?page={state.Page}&rowsperpage={state.PageSize}", replace: true);
+            }
+            else
+            {
+                NavigationManager.NavigateTo(new Uri(NavigationManager.Uri).GetLeftPart(UriPartial.Path) + $"?page={state.Page}&rowsperpage={state.PageSize}&sort={string.Join(",", orderByFields)}", replace: true);
+            }
         }
         return gridData;
     }

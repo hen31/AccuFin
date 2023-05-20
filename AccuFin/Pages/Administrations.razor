@@ -5,9 +5,10 @@
 <CollectionGridComponent T="AdministrationCollectionItem"
                          CollectionSource="@AdministrationClient"
                          Title="Administraties"
+                         RewriteUrl="true"
                          AddHref="/administration">
     <Columns>
-        <PropertyColumn Property="x => x.Name" Title="Naam" Sortable="true" />
+        <PropertyColumn Property="x => x.Name" Title="Naam" Sortable="true"/>
         <PropertyColumn Property="x => x.AdministrationRegistryCode" Title="Kvk" Sortable="true" />
         <TemplateColumn Resizable="false" CellStyle="width:64px;" Sortable="false">
             <CellTemplate>
@@ -19,6 +20,8 @@
 
 
 @code {
+    [Inject]
+    public NavigationManager NavigationManager { get; set; }
 
     [Inject]
     public AdministrationClient AdministrationClient { get; set; }
