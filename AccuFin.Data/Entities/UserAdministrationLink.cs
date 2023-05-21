@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AccuFin.Data.Entities
+﻿namespace AccuFin.Data.Entities
 {
     public class UserAdministrationLink : BaseEntityGuidId
     {
@@ -13,5 +7,8 @@ namespace AccuFin.Data.Entities
 
         public Guid AdministrationId { get; set; }
         public Administration Administration { get; set; }
+
+        public UserRoleInAdministration Roles { get; set; }
+
     }
 }

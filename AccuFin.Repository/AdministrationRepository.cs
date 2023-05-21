@@ -3,11 +3,6 @@ using AccuFin.Data;
 using AccuFin.Data.Entities;
 using AccuFin.Data.Mappers;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AccuFin.Repository
 {
@@ -31,8 +26,8 @@ namespace AccuFin.Repository
         public async Task<FinCollection<AdministrationCollectionItem>> GetCollectionAsync(int page, int pageSize, string[] orderBy, string singleSearchText)
         {
             EntityRepository<Administration, Guid> administrationRepository = new EntityRepository<Administration, Guid>(DatabaseContext);
-            return await administrationRepository.GetCollectionAsync(page, pageSize, orderBy, 
-                b => EF.Functions.Like(b.Name, $"%{singleSearchText}%") || EF.Functions.Like(b.AdministrationRegistryCode, $"{singleSearchText}%"),  
+            return await administrationRepository.GetCollectionAsync(page, pageSize, orderBy,
+                b => EF.Functions.Like(b.Name, $"%{singleSearchText}%") || EF.Functions.Like(b.AdministrationRegistryCode, $"{singleSearchText}%"),
                 b => b.MapForCollection());
         }
 
@@ -44,7 +39,14 @@ namespace AccuFin.Repository
             {
                 return null;
             }
-            return item.Map();
+            var itemModel = item.Map();
+            itemModel.Users = (await GetUsersForAdministrationMapped(item)).Map();
+            return itemModel;
+        }
+
+        public async Task<List<UserAdministrationLink>> GetUsersForAdministrationMapped(Administration administration)
+        {
+            return await DatabaseContext.UserAdministrationLink.Where(b => b.AdministrationId == administration.Id).Include(b => b.User).ToListAsync();
         }
 
         public async Task<AdministrationModel> EditItemAsync(Guid id, AdministrationModel model)
@@ -68,5 +70,10 @@ namespace AccuFin.Repository
             return true;
         }
 
+        public async Task<FinCollection<AdministrationCollectionItem>> GetMyAdministrationsAsync(string searchText, AuthorizedUser authorizedUser)
+        {
+            EntityRepository<Administration, Guid> administrationRepository = new EntityRepository<Administration, Guid>(DatabaseContext);
+            return null;
+        }
     }
 }

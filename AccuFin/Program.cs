@@ -2,7 +2,6 @@ using AccuFin;
 using AccuFin.Api.Client;
 using AccuFin.Services;
 using Blazored.LocalStorage;
-using Blazored.SessionStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;

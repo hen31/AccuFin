@@ -1,7 +1,7 @@
-﻿using FluentValidation;
+﻿using AccuFin.Api.Models.User;
+using FluentValidation;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace AccuFin.Api.Models
 {
@@ -12,6 +12,8 @@ namespace AccuFin.Api.Models
         public string AdministrationRegistryCode { get; set; }
         public string TelephoneNumber { get; set; }
         public string EmailAdress { get; set; }
+
+        public List<UserAdministrationLinkModel> Users { get; set; } = new List<UserAdministrationLinkModel>();
 
         public IValidator<AdministrationModel> GetValidator()
         {

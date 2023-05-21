@@ -1,8 +1,5 @@
 ﻿using AccuFin.Api.Client;
-using AccuFin.Api.Client.Authentication;
 using Blazored.LocalStorage;
-using System;
-using System.Threading.Tasks;
 
 namespace AccuFin.Services
 {

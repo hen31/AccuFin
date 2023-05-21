@@ -1,8 +1,6 @@
 ﻿using AccuFin.Api.Models;
-using System;
 using System.Collections.Generic;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace AccuFin.Api.Client

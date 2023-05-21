@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace AccuFin.Api.Models.Authentication
+﻿namespace AccuFin.Api.Models.Authentication
 {
     public class LoginModel
     {

@@ -5,17 +5,11 @@ using AccuFin.Repository;
 using AccuFin.Api.Services;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using AccuFin.Api.Areas.Identity.Data;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
-using System;
-using Microsoft.Extensions.DependencyInjection;
 using AccuFin.Data;
 using AccuFin.Api.Controllers.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Microsoft.Extensions.Options;
-using Microsoft.AspNetCore.Authentication;
 using AccuFin.Api.Client;
 using AccuFin.Api;
 

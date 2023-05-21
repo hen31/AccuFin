@@ -1,6 +1,4 @@
-﻿using AccuFin.Data.Entities;
-
-namespace AccuFin.Api
+﻿namespace AccuFin.Api
 {
     public static class Policy
     {

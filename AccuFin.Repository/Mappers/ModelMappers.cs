@@ -1,10 +1,6 @@
 ﻿using AccuFin.Api.Models;
+using AccuFin.Api.Models.User;
 using AccuFin.Data.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AccuFin.Data.Mappers
 {
@@ -41,6 +37,17 @@ namespace AccuFin.Data.Mappers
             item.EmailAdress = model.EmailAdress;
             item.TelephoneNumber = model.TelephoneNumber;
             return item;
+        }
+
+        public static UserAdministrationLinkModel Map(this UserAdministrationLink entity)
+        {
+            return new UserAdministrationLinkModel()
+            {
+                Id = entity.Id,
+                Email = entity.User.EmailAdress,
+                Name = entity.User.Name,
+                Role = entity.Roles
+            };
         }
 
     }

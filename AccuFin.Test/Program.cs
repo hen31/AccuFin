@@ -2,7 +2,6 @@
 using AccuFin.Api.Client;
 using AccuFin.Api.Client.Authentication;
 using AccuFin.Api.Models;
-using AccuFin.Api.Models.Authentication;
 
 Console.WriteLine("AccuFin test application");
 

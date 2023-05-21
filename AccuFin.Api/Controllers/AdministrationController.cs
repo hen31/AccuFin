@@ -3,7 +3,6 @@ using AccuFin.Data;
 using AccuFin.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
 namespace AccuFin.Api.Controllers
 {
@@ -87,6 +86,18 @@ namespace AccuFin.Api.Controllers
             //parse orderby;
             return await _administrationRepository.GetCollectionAsync(page, pageSize, orderBy?.Split(','), singleSearch);
         }
+        [HttpGet("myadministrations/{searchText}")]
+        [Authorize(Policy = Policy.Administrator)]
+        public async Task<ActionResult<FinCollection<AdministrationCollectionItem>>> GetMyAdministrationsAsync(string searchText)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            //parse orderby;
+            return BadRequest();// await _administrationRepository.GetMyAdministrationsAsync(searchText);
+        }
+        
 
         [HttpPost]
         [Authorize(Policy = Policy.Administrator)]

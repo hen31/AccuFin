@@ -1,10 +1,7 @@
 ﻿using AccuFin.Api.Models;
 using AccuFin.Api.Models.Authentication;
-using System;
 using System.Collections.Generic;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace AccuFin.Api.Client.Authentication

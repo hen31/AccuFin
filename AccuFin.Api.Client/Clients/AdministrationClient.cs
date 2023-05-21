@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -24,7 +23,10 @@ namespace AccuFin.Api.Client
             return DoGetRequest<AdministrationModel>($"/{id}");
         }
 
-
+        public Task<Response<FinCollection<AdministrationCollectionItem>>> GetMyAdministrations(string searchText)
+        {
+            return DoGetRequest<FinCollection<AdministrationCollectionItem>>($"/myadministrations/{searchText}");
+        }
         public Task<Response<AdministrationModel, List<ValidationError>>> UpdateAdministrationAsync(AdministrationModel administration)
         {
             return DoPostRequest<AdministrationModel, List<ValidationError>>($"/{administration.Id}", administration);

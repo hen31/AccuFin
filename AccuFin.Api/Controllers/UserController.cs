@@ -3,7 +3,6 @@ using AccuFin.Data;
 using AccuFin.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
 namespace AccuFin.Api.Controllers
 {
