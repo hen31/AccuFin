@@ -9,6 +9,7 @@
         Controller = 4,
         SalaryAdmin = 8,
         Sales = 16,
-        Management = 32
+        Management = 32,
+        BackOffice = 64
     }
 }

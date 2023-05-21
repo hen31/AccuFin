@@ -13,11 +13,7 @@
             <img src="images/header.png" style="max-height: 100%;" />
         </MudAppBar>
         <MudDrawer ClipMode="DrawerClipMode.Docked" @bind-Open="_drawerOpen" Variant="@DrawerVariant.Persistent" Elevation="2" Color="Color.Primary">
-            <AuthorizeView>
-                <Authorized>
-                    <MudAutocomplete T="AdministrationModel" Label="Administratie"/>
-                </Authorized>
-            </AuthorizeView>
+           
 
             <AuthorizeView Roles="Admin">
                 <Authorized>

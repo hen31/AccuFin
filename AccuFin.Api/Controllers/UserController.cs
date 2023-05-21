@@ -17,21 +17,30 @@ namespace AccuFin.Api.Controllers
         {
             _userRepository = userRepository;
         }
-      
+
         [HttpGet]
         public async Task<ActionResult<CurrentUserModel>> GetCurrentUserAsync()
         {
             string emailAdress = HttpContext.GetCurrentUserEmail();
-            if(string.IsNullOrWhiteSpace(emailAdress))
+            if (string.IsNullOrWhiteSpace(emailAdress))
             {
                 return BadRequest();
             }
             return Ok(await _userRepository.GetOrCreateCurrentUser(emailAdress));
         }
 
+        [HttpGet("findbyemail/{emailAdress}")]
+        public async Task<ActionResult<CurrentUserModel>> FindByEmailAsync(string emailAdress)
+        {
+            if (string.IsNullOrWhiteSpace(emailAdress))
+            {
+                return BadRequest();
+            }
+            return Ok(await _userRepository.GetUserByEmailAsync(emailAdress));
+        }
 
         [HttpPost]
-        public async Task<ActionResult<CurrentUserModel>> UpdateCurrentUserAsync([FromBody]CurrentUserModel userModel)
+        public async Task<ActionResult<CurrentUserModel>> UpdateCurrentUserAsync([FromBody] CurrentUserModel userModel)
         {
             if (!ModelState.IsValid)
             {
@@ -43,7 +52,7 @@ namespace AccuFin.Api.Controllers
                 return BadRequest();
             }
             var updateResult = await _userRepository.UpdateUserAsync(emailAdress, userModel);
-            if(updateResult==null)
+            if (updateResult == null)
             {
                 return BadRequest();
             }

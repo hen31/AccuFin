@@ -3,8 +3,11 @@
         <MudText>@ContentText</MudText>
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="Cancel">Annuleren</MudButton>
-        <MudButton Color="@Color" Variant="Variant.Filled" OnClick="Submit">@ButtonText</MudButton>
+        <MudButton OnClick="Cancel">@CancelText</MudButton>
+        @if (ConfirmButton)
+        {
+            <MudButton Color="@Color" Variant="Variant.Filled" OnClick="Submit">@ButtonText</MudButton>
+        }
     </DialogActions>
 </MudDialog>
 @code {
@@ -13,8 +16,13 @@
     [Parameter] public string ContentText { get; set; }
 
     [Parameter] public string ButtonText { get; set; }
+    [Parameter]
+    public string CancelText { get; set; } = "Annuleren";
+
 
     [Parameter] public Color Color { get; set; }
+    [Parameter]
+    public bool ConfirmButton { get; set; } = true;
 
     void Submit() => MudDialog.Close(DialogResult.Ok(true));
     void Cancel() => MudDialog.Cancel();

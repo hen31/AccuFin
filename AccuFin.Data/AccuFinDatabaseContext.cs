@@ -8,6 +8,11 @@ namespace AccuFin.Data
         public AccuFinDatabaseContext(DbContextOptions<AccuFinDatabaseContext> options) : base(options)
         {
         }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<AuthorizedUser>().HasMany<UserAdministrationLink>();
+            modelBuilder.Entity<Administration>().HasMany<UserAdministrationLink>();
+        }
 
         public DbSet<AuthorizedUser> AuthorizedUsers { get; set; }
         public DbSet<Administration> Administrations { get; set; }

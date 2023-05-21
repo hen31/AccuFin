@@ -46,9 +46,35 @@ namespace AccuFin.Data.Mappers
                 Id = entity.Id,
                 Email = entity.User.EmailAdress,
                 Name = entity.User.Name,
-                Role = entity.Roles
+                UserId = entity.UserId,
+                Roles = ToRoles(entity.Roles)
             };
         }
+
+        private static List<AdministrationRole> ToRoles(UserRoleInAdministration entityRoles)
+        {
+            List<AdministrationRole> roles = new List<AdministrationRole>();
+            foreach(var role in AdministrationRole.GetRoles())
+            {
+                if(entityRoles.HasFlag((UserRoleInAdministration)role.Value))
+                {
+                    roles.Add(role);
+                }
+            }
+
+            return roles;
+        }
+
+        public static UserModel MapToModel(this AuthorizedUser entity)
+        {
+            return new UserModel()
+            {
+                Id = entity.Id,
+                Email = entity.EmailAdress,
+                Name = entity.Name
+            };
+        }
+        
 
     }
 }

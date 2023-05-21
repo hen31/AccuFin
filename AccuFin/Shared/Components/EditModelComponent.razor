@@ -181,7 +181,7 @@
         parameters.Add("Color", Color.Error);
 
         var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
-        var dialog = await DialogService.ShowAsync<DeleteDialog>("Verwijderen", parameters, options);
+        var dialog = await DialogService.ShowAsync<FinDialog>("Verwijderen", parameters, options);
         if (!(await dialog.Result).Canceled)
         {
             DeleteResponse = null;

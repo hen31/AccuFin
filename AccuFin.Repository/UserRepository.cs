@@ -1,6 +1,8 @@
 ﻿using AccuFin.Api.Models;
+using AccuFin.Api.Models.User;
 using AccuFin.Data;
 using AccuFin.Data.Entities;
+using AccuFin.Data.Mappers;
 using Microsoft.EntityFrameworkCore;
 
 namespace AccuFin.Repository
@@ -49,6 +51,16 @@ namespace AccuFin.Repository
             currentUserModel.MobileNumber = autherizedUser.MobileNumber;
             currentUserModel.Name = autherizedUser.Name;
             return currentUserModel;
+        }
+
+        public async Task<UserModel> GetUserByEmailAsync(string emailAdress)
+        {
+            var autherizedUser = await DatabaseContext.AuthorizedUsers.FirstOrDefaultAsync(b => b.EmailAdress == emailAdress);
+            if (autherizedUser == null)
+            {
+                return null;
+            }
+            return autherizedUser.MapToModel();
         }
     }
 }
