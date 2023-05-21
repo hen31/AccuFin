@@ -1,4 +1,5 @@
-﻿@typeparam T
+﻿@using System.Web;
+@typeparam T
 @attribute [CascadingTypeParameter(nameof(T))]
 
 <CascadingValue IsFixed="true" Value="_grid">@Columns</CascadingValue>
@@ -12,12 +13,29 @@
     <ToolBarContent>
         <MudText Typo="Typo.h6">@Title</MudText>
         <MudSpacer />
-        <MudIconButton Icon="@Icons.Material.Filled.Refresh" OnClick="_grid.ReloadServerData"></MudIconButton>
+        @if (AllowFilter)
+        {
+            if (Filter != null)
+            {
+                @Filter
+            }
+            else
+            {
+                <MudTextField @bind-Value="SingleSearchText" Placeholder="Zoeken"
+                              Adornment="Adornment.Start"
+                              Margin="Margin.Dense"
+                              AdornmentIcon="@Icons.Material.Filled.Search"
+                              TextChanged="_grid.ReloadServerData"
+                              IconSize="Size.Medium" />
+            }
+        }
+        <MudIconButton Class="pa-2 mt-auto" margin Icon="@Icons.Material.Filled.Refresh" Size="Size.Medium" OnClick="_grid.ReloadServerData"></MudIconButton>
         @if (!string.IsNullOrWhiteSpace(AddHref))
         {
-            <MudButton Href="@AddHref">Toevoegen</MudButton>
+            <MudButton Class="pa-2 mt-auto" Size="Size.Medium" Href="@AddHref">Toevoegen</MudButton>
         }
     </ToolBarContent>
+
     <Columns>
         @Columns
     </Columns>
@@ -54,6 +72,10 @@
                     }
 
                 }
+                if (NavigationManager.TryGetQueryString<string>("singlesearch", out string singleSearch))
+                {
+                    SingleSearchText = singleSearch;
+                }
             }
         }
     }
@@ -64,6 +86,10 @@
 
     [Parameter]
     public RenderFragment? Columns { get; set; }
+
+
+    [Parameter]
+    public RenderFragment? Filter { get; set; }
     [Parameter]
     public string Title { get; set; }
     [Parameter]
@@ -73,13 +99,18 @@
     public int Page { get; set; } = 0;
     [Parameter]
     public bool RewriteUrl { get; set; }
+
+    [Parameter]
+    public bool AllowFilter { get; set; }
     [Inject]
     public NavigationManager NavigationManager { get; set; }
+
+    private string SingleSearchText { get; set; }
 
     private async Task<GridData<T>> ServerReload(GridState<T> state)
     {
         var orderByFields = state.SortDefinitions.OrderBy(b => b.Index).Select(b => b.SortBy + ";" + b.Descending).ToArray();
-        var response = await CollectionSource.GetCollectionAsync(state.Page + 1, state.PageSize, orderByFields);
+        var response = await CollectionSource.GetCollectionAsync(state.Page + 1, state.PageSize, orderByFields, SingleSearchText);
         var gridData = new GridData<T>();
         if (response.Success)
         {
@@ -88,14 +119,17 @@
         }
         if (RewriteUrl)
         {
-            if (orderByFields.Length == 0)
+            string parametersUrl = $"?page={state.Page}&rowsperpage={state.PageSize}";
+            if (orderByFields.Length != 0)
             {
-                NavigationManager.NavigateTo(new Uri(NavigationManager.Uri).GetLeftPart(UriPartial.Path) + $"?page={state.Page}&rowsperpage={state.PageSize}", replace: true);
+                parametersUrl += $"&sort={string.Join(",", orderByFields)}";
             }
-            else
+            if(!string.IsNullOrWhiteSpace(SingleSearchText))
             {
-                NavigationManager.NavigateTo(new Uri(NavigationManager.Uri).GetLeftPart(UriPartial.Path) + $"?page={state.Page}&rowsperpage={state.PageSize}&sort={string.Join(",", orderByFields)}", replace: true);
+                parametersUrl += $"&singlesearch={HttpUtility.UrlEncode(SingleSearchText)}";
+
             }
+            NavigationManager.NavigateTo(new Uri(NavigationManager.Uri).GetLeftPart(UriPartial.Path) + parametersUrl, replace: true);
         }
         return gridData;
     }

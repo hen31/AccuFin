@@ -2,6 +2,7 @@
 using AccuFin.Data;
 using AccuFin.Data.Entities;
 using AccuFin.Data.Mappers;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,19 +26,21 @@ namespace AccuFin.Repository
             administration = entity.Map();
             return administration;
         }
-       
 
-        public async Task<FinCollection<AdministrationCollectionItem>> GetCollectionAsync(int page, int pageSize, string[] orderBy)
+
+        public async Task<FinCollection<AdministrationCollectionItem>> GetCollectionAsync(int page, int pageSize, string[] orderBy, string singleSearchText)
         {
             EntityRepository<Administration, Guid> administrationRepository = new EntityRepository<Administration, Guid>(DatabaseContext);
-            return await administrationRepository.GetCollectionAsync(page, pageSize, orderBy, b => true, b => b.MapForCollection());
+            return await administrationRepository.GetCollectionAsync(page, pageSize, orderBy, 
+                b => EF.Functions.Like(b.Name, $"%{singleSearchText}%") || EF.Functions.Like(b.AdministrationRegistryCode, $"{singleSearchText}%"),  
+                b => b.MapForCollection());
         }
 
         public async Task<AdministrationModel> GetItemByIdAsync(Guid id)
         {
             EntityRepository<Administration, Guid> administrationRepository = new EntityRepository<Administration, Guid>(DatabaseContext);
             var item = await administrationRepository.GetById(id);
-            if(item == null)
+            if (item == null)
             {
                 return null;
             }
@@ -48,7 +51,7 @@ namespace AccuFin.Repository
         {
             EntityRepository<Administration, Guid> administrationRepository = new EntityRepository<Administration, Guid>(DatabaseContext);
             var item = await administrationRepository.GetById(id);
-            if(item == null) { return null; }
+            if (item == null) { return null; }
             item = model.Map(item);
             administrationRepository.Update(item);
             await DatabaseContext.SaveChangesAsync();

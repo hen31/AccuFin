@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace AccuFin.Api.Client
 {
@@ -14,9 +15,9 @@ namespace AccuFin.Api.Client
             Area = "administration";
         }
 
-        public Task<Response<FinCollection<AdministrationCollectionItem>, List<ValidationError>>> GetCollectionAsync(int page, int pageSize, string[] orderBy)
+        public Task<Response<FinCollection<AdministrationCollectionItem>, List<ValidationError>>> GetCollectionAsync(int page, int pageSize, string[] orderBy, string singleSearchText)
         {
-            return DoGetRequest<FinCollection<AdministrationCollectionItem>, List<ValidationError>>(GenerateCollectionParametersUrl(page, pageSize, orderBy));
+            return DoGetRequest<FinCollection<AdministrationCollectionItem>, List<ValidationError>>(GenerateCollectionParametersUrl(page, pageSize, orderBy, singleSearchText));
         }
         public Task<Response<AdministrationModel>> GetAdministrationByIdAsync(Guid id)
         {
@@ -28,14 +29,19 @@ namespace AccuFin.Api.Client
         {
             return DoPostRequest<AdministrationModel, List<ValidationError>>($"/{administration.Id}", administration);
         }
-        private static string GenerateCollectionParametersUrl(int page, int pageSize, string[] orderBy)
+        private static string GenerateCollectionParametersUrl(int page, int pageSize, string[] orderBy, string singleSearch)
         {
             string parametersUrl = $"?page={page}&pageSize={pageSize}";
-            if (orderBy == null || orderBy.Length == 0)
+
+            if (orderBy != null && orderBy.Length > 0)
             {
-                return parametersUrl;
+                parametersUrl += $"&orderby={string.Join(',', orderBy)}";
             }
-            return parametersUrl + $"&orderby={string.Join(',', orderBy)}";
+            if(!string.IsNullOrWhiteSpace(singleSearch))
+            {
+                parametersUrl += $"&singleSearch={HttpUtility.UrlEncode(singleSearch)}";
+            }
+            return parametersUrl;
         }
 
         public Task<Response<AdministrationModel, List<ValidationError>>> AddAdministrationAsync(AdministrationModel administration)

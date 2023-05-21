@@ -7,7 +7,7 @@ namespace AccuFin.Api.Client
     public interface ICollectionSourceClient<T>
     {
 
-        Task<Response<FinCollection<T>, List<ValidationError>>> GetCollectionAsync(int page, int pageSize, string[] orderBy);
+        Task<Response<FinCollection<T>, List<ValidationError>>> GetCollectionAsync(int page, int pageSize, string[] orderBy, string singleSearchText);
 
     }
 }
