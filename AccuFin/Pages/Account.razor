@@ -15,9 +15,6 @@
     [Inject]
     public UserClient UserClient { get; set; }
 
-    protected override async Task OnInitializedAsync()
-    {
-    }
     public async Task<InitializeEditFormResult<CurrentUserModel>> GetModelAsync()
     {
         var response = await UserClient.GetCurrentUserAsync();

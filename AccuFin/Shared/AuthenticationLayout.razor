@@ -2,7 +2,7 @@
 <MudLayout>
     <MudMainContent Class="mud-theme-primary" Style="min-height:100vh">
         <MudContainer MaxWidth="MaxWidth.Small" Style="text-align:center">
-            <MudImage Src="images/default.png" Style="max-width:50%"/>
+            <MudImage Src="images/default.png" Style="max-width:50%" />
             <MudPaper Elevation="3" Class="pa-3" Style="text-align:left">
                 @Body
             </MudPaper>
@@ -24,6 +24,8 @@
 <MudSnackbarProvider />
 
 @code {
+
+
     MudTheme DefaultTheme = new MudTheme()
         {
             Palette = new PaletteLight()

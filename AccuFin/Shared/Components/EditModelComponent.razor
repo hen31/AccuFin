@@ -37,7 +37,7 @@
                     <MudAlert Severity="Severity.Error">Opslaan mislukt</MudAlert>
                 }
             }
-            @if (DeleteResponse !=null && (!DeleteResponse.Success || !DeleteResponse.Data))
+            @if (DeleteResponse != null && (!DeleteResponse.Success || !DeleteResponse.Data))
             {
                 <MudAlert Severity="Severity.Error">Verwijderen mislukt</MudAlert>
             }
@@ -63,6 +63,8 @@
 @code {
     public ModelType Model { get; set; }
     [Inject]
+    public PreviousNavigationService PreviousNavigationService { get; set; }
+    [Inject]
     public NavigationManager NavigationManager { get; set; }
     [Inject]
     public IDialogService DialogService { get; set; }
@@ -84,6 +86,9 @@
     public string DeleteText { get; set; } = "Verwijderen";
     [Parameter]
     public string NavigateToAfterDelete { get; set; }
+    [Parameter]
+    public string NavigateToAfterAddOrEdit { get; set; }
+
     [Parameter]
     public Func<ModelType, string> OnGetObjectToDeleteDescription { get; set; }
 
@@ -138,6 +143,17 @@
             {
                 Model = SaveResponse.Data;
                 _ready = true;
+                if (!string.IsNullOrWhiteSpace(NavigateToAfterAddOrEdit))
+                {
+                    if (PreviousNavigationService.GetReturnUrl() != null)
+                    {
+                        NavigationManager.NavigateTo(NavigateToAfterAddOrEdit + PreviousNavigationService.GetReturnUrl());
+                    }
+                    else
+                    {
+                        NavigationManager.NavigateTo(NavigateToAfterAddOrEdit);
+                    }
+                }
             }
         }
         _busy = false;
@@ -173,7 +189,14 @@
             if (DeleteResponse.Success && DeleteResponse.Data)
             {
                 _ready = true;
-                NavigationManager.NavigateTo(NavigateToAfterDelete);
+                if (PreviousNavigationService.GetReturnUrl() != null)
+                {
+                    NavigationManager.NavigateTo(NavigateToAfterDelete + PreviousNavigationService.GetReturnUrl());
+                }
+                else
+                {
+                    NavigationManager.NavigateTo(NavigateToAfterDelete);
+                }
             }
         }
         _busy = false;

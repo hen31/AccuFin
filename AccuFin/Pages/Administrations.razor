@@ -13,7 +13,7 @@
         <PropertyColumn Property="x => x.AdministrationRegistryCode" Title="Kvk" Sortable="true" />
         <TemplateColumn Resizable="false" CellStyle="width:64px;" Sortable="false">
             <CellTemplate>
-                <MudIconButton Icon="@Icons.Material.Filled.Edit" Href="@("/administration/" +context.Item.Id)" />
+                <MudIconButton Icon="@Icons.Material.Filled.Edit" Href="@("/administration/" +context.Item.Id + PreviousNavigationService.GetUrlQuery())" />
             </CellTemplate>
         </TemplateColumn>
     </Columns>
@@ -21,6 +21,8 @@
 
 
 @code {
+    [Inject]
+    public PreviousNavigationService PreviousNavigationService { get; set; }
     [Inject]
     public NavigationManager NavigationManager { get; set; }
 

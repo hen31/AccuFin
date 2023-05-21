@@ -6,6 +6,7 @@
                     OnDeleteModel="DeleteModelAsync"
                     OnGetObjectToDeleteDescription="@((model)=> model.Name)"
                     NavigateToAfterDelete="/administrations"
+                    NavigateToAfterAddOrEdit="/administrations"
                     OnSaveValidModel="OnSave"
                     OnlyOnce="true">
     <MudTextField Label="Naam"
