@@ -6,6 +6,8 @@
 <MudDataGrid @ref="_grid" T="T"
              ServerData="@(new Func<GridState<T>, Task<GridData<T>>>(ServerReload))"
              RowsPerPage="RowsPerPage" CurrentPage="Page"
+               
+             Hover=true
              SortMode="SortMode.Multiple" Filterable="false" Loading="true">
     <LoadingContent>
         <MudProgressCircular Indeterminate="true" />
@@ -124,7 +126,7 @@
             {
                 parametersUrl += $"&sort={string.Join(",", orderByFields)}";
             }
-            if(!string.IsNullOrWhiteSpace(SingleSearchText))
+            if (!string.IsNullOrWhiteSpace(SingleSearchText))
             {
                 parametersUrl += $"&singlesearch={HttpUtility.UrlEncode(SingleSearchText)}";
 
