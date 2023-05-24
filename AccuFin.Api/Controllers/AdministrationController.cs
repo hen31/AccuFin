@@ -58,7 +58,7 @@ namespace AccuFin.Api.Controllers
         }
         [HttpPost("delete/{id}")]
         [Authorize(Policy = Policy.Administrator)]
-        public async Task<ActionResult<AdministrationModel>> EditItemById(Guid id)
+        public async Task<ActionResult<AdministrationModel>> DeleteItemById(Guid id)
         {
             if (!ModelState.IsValid)
             {
@@ -86,16 +86,15 @@ namespace AccuFin.Api.Controllers
             //parse orderby;
             return await _administrationRepository.GetCollectionAsync(page, pageSize, orderBy?.Split(','), singleSearch);
         }
-        [HttpGet("myadministrations/{searchText}")]
-        [Authorize(Policy = Policy.Administrator)]
-        public async Task<ActionResult<FinCollection<AdministrationCollectionItem>>> GetMyAdministrationsAsync(string searchText)
+        [HttpGet("myadministrations")]
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<AdministrationCollectionItem>>> GetMyAdministrationsAsync()
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            //parse orderby;
-            return BadRequest();// await _administrationRepository.GetMyAdministrationsAsync(searchText);
+            return Ok(await _administrationRepository.GetMyAdministrationsAsync(this.GetFinUserId()));
         }
         
 

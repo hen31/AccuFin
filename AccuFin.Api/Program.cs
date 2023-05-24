@@ -67,6 +67,8 @@ builder.Services.AddAuthentication(options =>
     };
 });
 builder.Services.AddTransient<IEmailSender, EmailSender>();
+builder.Services.AddScoped<RoleService>();
+
 builder.Services.AddAccuFinRepositories();
 builder.Services.AddAccuFinModels();
 

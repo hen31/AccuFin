@@ -112,10 +112,10 @@ namespace AccuFin.Repository
             return true;
         }
 
-        public async Task<FinCollection<AdministrationCollectionItem>> GetMyAdministrationsAsync(string searchText, AuthorizedUser authorizedUser)
+        public async Task<IEnumerable<AdministrationCollectionItem>> GetMyAdministrationsAsync(Guid authorizedUserId)
         {
-            EntityRepository<Administration, Guid> administrationRepository = new EntityRepository<Administration, Guid>(DatabaseContext);
-            return null;
+            return (await DatabaseContext.UserAdministrationLink.Where(b => b.UserId == authorizedUserId).Include(b => b.Administration).Select(b => b.Administration).ToListAsync()).Select(b => b.MapForCollection());
         }
+
     }
 }

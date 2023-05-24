@@ -14,6 +14,7 @@ using System.Security.Cryptography;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Net.Http.Headers;
 using System.Net.Http.Headers;
+using AccuFin.Repository;
 
 namespace AccuFin.Api.Controllers.Authentication
 {
@@ -26,25 +27,24 @@ namespace AccuFin.Api.Controllers.Authentication
         private readonly IEmailSender _emailSender;
         private readonly IConfiguration _configuration;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly UserRepository _userRepository;
 
         public AuthenticationController(UserManager<AccuFinUser> userManager,
             IdentityContext appDbContext, IEmailSender emailSender,
-            IConfiguration configuration, RoleManager<IdentityRole> roleManager)
+            IConfiguration configuration, RoleManager<IdentityRole> roleManager, UserRepository userRepository)
         {
             _userManager = userManager;
             _appDbContext = appDbContext;
             _emailSender = emailSender;
             _configuration = configuration;
             _roleManager = roleManager;
+            _userRepository = userRepository;
         }
 
         [HttpGet("makeadmin")]
         public async Task<ActionResult<bool>> GetCurrentUserAsync()
         {
-            if (await _roleManager.RoleExistsAsync(Roles.Administrator) == false)
-            {
-                await _roleManager.CreateAsync(new IdentityRole(Roles.Administrator));
-            }
+
             var user = await _userManager.FindByEmailAsync("hendrikdejonge@hotmail.com");
             await AddToRole(user, Roles.Administrator);
             return Ok(true);
@@ -140,7 +140,12 @@ namespace AccuFin.Api.Controllers.Authentication
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                     new Claim("client_id", clientId)
                 };
-            
+            var finUser = await _userRepository.GetUserByEmailAsync(user.Email);
+            if (finUser != null)
+            {
+                authClaims.Add(new Claim("fui", finUser.Id.ToString()));
+            }
+
             var userRoles = await _userManager.GetRolesAsync(user);
             foreach (var userRole in userRoles)
             {

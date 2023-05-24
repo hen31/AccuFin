@@ -7,66 +7,59 @@
         <MudSpacer />
         <AuthorizeView>
             <Authorized>
-                <MudText Typo="Typo.h6">@(context.User.Claims.FirstOrDefault(b => b.Type == ClaimTypes.Email)?.Value)</MudText>
+                <MudText Typo="Typo.caption" Align="Align.Center">@(context.User.Claims.FirstOrDefault(b => b.Type == ClaimTypes.Email)?.Value)</MudText>
                 </Authorized>
             </AuthorizeView>
             <img src="images/header.png" style="max-height: 100%;" />
         </MudAppBar>
         <MudDrawer ClipMode="DrawerClipMode.Docked" @bind-Open="_drawerOpen" Variant="@DrawerVariant.Persistent" Elevation="2" Color="Color.Primary">
-           
-
-            <AuthorizeView Roles="Admin">
-                <Authorized>
-                    <MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Contacts" Href="/administrations" IconColor="Color.Inherit">Administraties</MudNavLink>
-                </Authorized>
-            </AuthorizeView>
-
-            <MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.ManageAccounts" Href="/account" IconColor="Color.Inherit">Account</MudNavLink>
-            <MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Logout" OnClick="LogOff" IconColor="Color.Inherit">Uitloggen</MudNavLink>
-        </MudDrawer>
-        <MudMainContent>
-            @Body
-        </MudMainContent>
-    </MudLayout>
 
 
-    <MudThemeProvider Theme="@DefaultTheme" />
-    <MudDialogProvider />
-    <MudSnackbarProvider />
-
-    @code {
-    MudTheme DefaultTheme = new MudTheme()
+            @if (Administrations != null && Administrations.Success)
         {
-            Palette = new PaletteLight()
-            {
-                Primary = new MudBlazor.Utilities.MudColor("#4D65F1"),
-                AppbarBackground = new MudBlazor.Utilities.MudColor("#4D65F1"),
+            <MudPaper Class="pa-2">
 
-            },
-            LayoutProperties = new LayoutProperties()
-            {
-                DefaultBorderRadius = "0px"
-            }
-            
-        };
-    bool _drawerOpen = true;
+                <MudAutocomplete T="AdministrationCollectionItem"
+                  @ref="AdminstrationAutocomplete"
+                                 SearchFunc="SearchAdministration"
+                @bind-Value="SelectedAdministration"
+                @bind-Value:after="SelectedAdministrationChanged"
+                                 Label="Andere administratie"
+                                 Class="mb-1 mt-0 pa-0" Style="background-color:var(--mud-palette-background)"
+                                 CoerceValue=true
+                                 ToStringFunc="@(e=> string.IsNullOrWhiteSpace(e.AdministrationRegistryCode) ? $"{e.Name}" : $"({e.AdministrationRegistryCode}) - {e.Name}")">
+                </MudAutocomplete>
+            </MudPaper>
+        }
+        @if (CurrentAdministration != null)
+        {
+            <MudPaper Class="pa-2" Style="background-color:var(--mud-palette-primary-lighten);color:var(--mud-palette-primary-text) !important">
 
-    void DrawerToggle()
-    {
-        _drawerOpen = !_drawerOpen;
-    }
+                <MudText Typo="Typo.subtitle1">@CurrentAdministration.Name</MudText>
+                @if (!string.IsNullOrWhiteSpace(CurrentAdministration.AdministrationRegistryCode))
+                {
+                    <MudText Typo="Typo.caption">Kvk: @CurrentAdministration.AdministrationRegistryCode</MudText>
+                }
+                }
 
-    [Inject]
-    public AdministrationClient AdministrationClient{ get; set; }
+            </MudPaper>
+        }
 
-    [Inject]
-    private ClientAuthentication ClientAuthentication { get; set; }
-    [Inject]
-    private NavigationManager NavigationManager { get; set; }
-    public async Task LogOff()
-    {
-        await ClientAuthentication.SetToken(null);
-        await ClientAuthentication.SetRefreshTokenAsync(null);
-        NavigationManager.NavigateTo("/login");
-    }
-}
+        <AuthorizeView Roles="Admin">
+            <Authorized>
+                <MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Contacts" Href="/administrations" IconColor="Color.Inherit">Administraties</MudNavLink>
+            </Authorized>
+        </AuthorizeView>
+
+        <MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.ManageAccounts" Href="/account" IconColor="Color.Inherit">Account</MudNavLink>
+        <MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Logout" OnClick="LogOff" IconColor="Color.Inherit">Uitloggen</MudNavLink>
+    </MudDrawer>
+    <MudMainContent>
+        @Body
+    </MudMainContent>
+</MudLayout>
+
+
+<MudThemeProvider Theme="@DefaultTheme" />
+<MudDialogProvider />
+<MudSnackbarProvider />

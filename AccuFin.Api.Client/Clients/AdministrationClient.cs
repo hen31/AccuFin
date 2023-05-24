@@ -23,9 +23,9 @@ namespace AccuFin.Api.Client
             return DoGetRequest<AdministrationModel>($"/{id}");
         }
 
-        public Task<Response<FinCollection<AdministrationCollectionItem>>> GetMyAdministrations(string searchText)
+        public Task<Response<IEnumerable<AdministrationCollectionItem>>> GetMyAdministrations()
         {
-            return DoGetRequest<FinCollection<AdministrationCollectionItem>>($"/myadministrations/{searchText}");
+            return DoGetRequest<IEnumerable<AdministrationCollectionItem>>($"/myadministrations");
         }
         public Task<Response<AdministrationModel, List<ValidationError>>> UpdateAdministrationAsync(AdministrationModel administration)
         {
