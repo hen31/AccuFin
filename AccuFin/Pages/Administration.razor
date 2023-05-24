@@ -33,7 +33,8 @@
             <TemplateColumn Resizable="false" Sortable="false">
                 <CellTemplate Context="cellContext">
                     <MudSelect T="AdministrationRole" SelectAllText="Alles selecteren" 
-                        MultiSelection="true"
+                        MultiSelection="true" 
+                        @bind-SelectedValues="cellContext.Item.Roles"
                         >
                         @foreach (var role in Roles)
                         {

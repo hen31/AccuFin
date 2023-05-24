@@ -57,8 +57,6 @@ namespace AccuFin.Repository
                 }
                 var userLinkFromDb = currentUsersOfAdministration.SingleOrDefault(b => b.UserId == userLink.UserId);
                 userLinkFromDb.Roles = (UserRoleInAdministration)userLink.Roles.Sum(b => b.Value);
-                userLinkFromDb.User = null;
-                userLinkFromDb.Administration = null;
                 administrationLinkRepository.Update(userLinkFromDb);
             }
             await DatabaseContext.SaveChangesAsync();

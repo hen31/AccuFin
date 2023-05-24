@@ -11,7 +11,7 @@ namespace AccuFin.Api.Models
         
         public string Name { get; set; }
         public string Email { get; set; }
-        public List<AdministrationRole> Roles { get; set; } = new List<AdministrationRole>();
+        public IEnumerable<AdministrationRole> Roles { get; set; } = new List<AdministrationRole>();
     }
 
     public class AdministrationRole
