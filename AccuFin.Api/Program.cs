@@ -73,6 +73,7 @@ builder.Services.AddAccuFinRepositories();
 builder.Services.AddAccuFinModels();
 
 var app = builder.Build();
+app.UseStaticFiles();
 app.MapControllers();
 app.UseCors("AllowAllOrigins");
 app.UseAuthentication(); ;

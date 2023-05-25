@@ -9,6 +9,42 @@
                     NavigateToAfterAddOrEdit="/administrations"
                     OnSaveValidModel="OnSave"
                     OnlyOnce="true">
+    <MudCard Style="width:fit-content;margin-left:auto;margin-right:auto;">
+        <MudCardContent>
+            @if (string.IsNullOrWhiteSpace(context.ImageData) && string.IsNullOrWhiteSpace(context.ImageFileName))
+            {
+                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="300px" Height="250px" Animation="Animation.False" Style="margin-left:auto; margin-right:auto" />
+            }
+            else if (!string.IsNullOrWhiteSpace(context.ImageData))
+            {
+                <MudImage Height="250" Src="@("data:image/png;base64, " + context.ImageData)" ObjectPosition="ObjectPosition.Center" ObjectFit="ObjectFit.ScaleDown" />
+            }
+            else
+            {
+                <MudImage Height="250" Src="@("https://localhost:7058/filestore/images/" +context.ImageFileName)" ObjectPosition="ObjectPosition.Center" ObjectFit="ObjectFit.ScaleDown" />
+            }
+        </MudCardContent>
+        <MudCardActions>
+            <MudStack>
+                <MudFileUpload T="IBrowserFile" MaximumFileCount="1" Accept="image/png, image/jpeg" OnFilesChanged="@(async (InputFileChangeEventArgs e)=> await FilesChanged(e, context))">
+                    <ButtonTemplate Context="cellContext">
+                        <MudButton HtmlTag="label"
+                                   Color="Color.Secondary"
+                                   StartIcon="@Icons.Material.Filled.Image"
+                                   for="@cellContext">Afbeelding toevoegen</MudButton>
+                    </ButtonTemplate>
+                </MudFileUpload>
+                @if (!string.IsNullOrWhiteSpace(context.ImageFileName))
+                {
+                    <MudButton OnClick="()=> {context.ImageData = null; context.ImageFileName=null;}"
+                               Color="Color.Error"
+                               StartIcon="@Icons.Material.Filled.Delete">Afbeelding verwijderen</MudButton>
+                }
+            </MudStack>
+        </MudCardActions>
+    </MudCard>
+
+
     <MudTextField Label="Naam"
     @bind-Value="context.Name" For="@(() => context.Name)" />
     <MudTextField Label="Kvknummer" Class="mt-3"
@@ -17,6 +53,8 @@
     @bind-Value="context.TelephoneNumber" For="@(() =>context.TelephoneNumber)" />
     <MudTextField Label="Email" Class="mt-3"
     @bind-Value="context.EmailAdress" For="@(() =>context.EmailAdress)" />
+
+
 
     <MudDataGrid T="UserAdministrationLinkModel" Items="context.Users" Class="mt-3">
         <ToolBarContent>
@@ -32,10 +70,9 @@
             <PropertyColumn Property="x => x.Email" Title="Email" Sortable="true" />
             <TemplateColumn Resizable="false" Sortable="false">
                 <CellTemplate Context="cellContext">
-                    <MudSelect T="AdministrationRole" SelectAllText="Alles selecteren" 
-                        MultiSelection="true" 
-                        @bind-SelectedValues="cellContext.Item.Roles"
-                        >
+                    <MudSelect T="AdministrationRole" SelectAllText="Alles selecteren"
+                               MultiSelection="true"
+                    @bind-SelectedValues="cellContext.Item.Roles">
                         @foreach (var role in Roles)
                         {
                             <MudSelectItem T="AdministrationRole" Value="role">@role.Name</MudSelectItem>
@@ -53,96 +90,3 @@
 
 
 </EditModelComponent>
-
-@code {
-    [Inject]
-    public AdministrationClient AdministrationClient { get; set; }
-
-    [Inject]
-    public ISnackbar Snackbar { get; set; }
-
-    [Inject]
-    public IDialogService DialogService { get; set; }
-    [Inject]
-    public UserClient UserClient { get; set; }
-    [Parameter]
-    public Guid Id { get; set; }
-
-    public string AddEmailAdress { get; set; }
-
-    public List<AdministrationRole> Roles { get; set; } 
-
-    public MudForm Form { get; set; }
-    [Inject]
-    public NavigationManager NavigationManager { get; set; }
-
-    protected override async Task OnInitializedAsync()
-    {
-        Roles = AdministrationRole.GetRoles();
-    }
-
-    public async Task<InitializeEditFormResult<AdministrationModel>> GetModelAsync()
-    {
-        if (Id == Guid.Empty)
-        {
-            return new InitializeEditFormResult<AdministrationModel>(new AdministrationModel(), null);
-        }
-        else
-        {
-            var response = await AdministrationClient.GetAdministrationByIdAsync(Id);
-            if (response.Success)
-            {
-                return new InitializeEditFormResult<AdministrationModel>(response.Data, response);
-            }
-            else
-            {
-                return new InitializeEditFormResult<AdministrationModel>(null, response);
-            }
-        }
-    }
-
-    private async Task<Response<bool>> DeleteModelAsync(AdministrationModel model)
-    {
-        return await AdministrationClient.DeleteAdministrationAsync(model.Id);
-    }
-
-    private async Task<Response<AdministrationModel, List<ValidationError>>> OnSave(AdministrationModel model)
-    {
-        if (Id == Guid.Empty)
-        {
-            return await AdministrationClient.AddAdministrationAsync(model);
-        }
-        else
-        {
-            return await AdministrationClient.UpdateAdministrationAsync(model);
-        }
-    }
-
-    public async Task AddUserByEmail(AdministrationModel model)
-    {
-        if (!string.IsNullOrWhiteSpace(AddEmailAdress))
-        {
-            var response = await UserClient.GetUserByEmailadressAsync(AddEmailAdress);
-            if (!response.Success)
-            {
-                Snackbar.Add("Fout bij ophalen gegevens", Severity.Error);
-            }
-
-            if (response.Data == null)
-            {
-                var parameters = new DialogParameters();
-                parameters.Add("ContentText", "Geen gebruiker met emailadres gevonden. Wilt u deze toevoegen?");
-                parameters.Add("CancelText", "Sluiten");
-                parameters.Add("ConfirmButton", false);
-
-                var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
-                var dialog = await DialogService.ShowAsync<FinDialog>("Niet gevonden", parameters, options);
-            }
-            else
-            {
-                model.Users.Add(new UserAdministrationLinkModel() { Email = response.Data.Email, Name = response.Data.Name, UserId =response.Data.Id });
-            }
-
-        }
-    }
-}

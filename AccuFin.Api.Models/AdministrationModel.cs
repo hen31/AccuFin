@@ -14,6 +14,8 @@ namespace AccuFin.Api.Models
         public string EmailAdress { get; set; }
 
         public List<UserAdministrationLinkModel> Users { get; set; } = new List<UserAdministrationLinkModel>();
+        public string ImageData { get; set; }
+        public string ImageFileName { get; set; }
 
         public IValidator<AdministrationModel> GetValidator()
         {

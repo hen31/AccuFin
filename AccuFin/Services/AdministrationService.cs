@@ -15,26 +15,26 @@ namespace AccuFin.Services
             this._localStorageService = localStorageService;
         }
 
-        public async Task<AdministrationModel> GetCurrentAdministration()
+        public async Task<AdministrationCollectionItem> GetCurrentAdministration()
         {
-            var sessionItem = await _sessionStorageService.GetItemAsync<AdministrationModel>("current_administration");
+            var sessionItem = await _sessionStorageService.GetItemAsync<AdministrationCollectionItem>("current_administration");
             if (sessionItem != null)
             {
                 return sessionItem;
             }
 
-            var localItem = await _localStorageService.GetItemAsync<AdministrationModel>("current_administration");
+            var localItem = await _localStorageService.GetItemAsync<AdministrationCollectionItem>("current_administration");
             if (localItem != null)
             {
-                await _sessionStorageService.SetItemAsync<AdministrationModel>("current_administration", localItem);
+                await _sessionStorageService.SetItemAsync<AdministrationCollectionItem>("current_administration", localItem);
             }
             return localItem;
         }
 
-        public async Task SetCurrentAdministration(AdministrationModel model)
+        public async Task SetCurrentAdministration(AdministrationCollectionItem model)
         {
-            await _localStorageService.SetItemAsync<AdministrationModel>("current_administration", model);
-            await _sessionStorageService.SetItemAsync<AdministrationModel>("current_administration", model);
+            await _localStorageService.SetItemAsync<AdministrationCollectionItem>("current_administration", model);
+            await _sessionStorageService.SetItemAsync<AdministrationCollectionItem>("current_administration", model);
         }
     }
 }

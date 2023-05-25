@@ -18,7 +18,7 @@ namespace AccuFin.Shared
         [Inject]
         public AdministrationService AdministrationService { get; set; }
 
-        public AdministrationModel CurrentAdministration { get; set; }
+        public AdministrationCollectionItem CurrentAdministration { get; set; }
 
         public AdministrationCollectionItem SelectedAdministration { get; set; }
 
@@ -32,13 +32,7 @@ namespace AccuFin.Shared
         {
             if (SelectedAdministration != null)
             {
-                var administration = await AdministrationClient.GetAdministrationByIdAsync(SelectedAdministration.Id);
-                if (!administration.Success)
-                {
-                    Snackbar.Add("Ophalen administratie is mislukt", Severity.Error);
-                    return;
-                }
-                CurrentAdministration = administration.Data;
+                CurrentAdministration = SelectedAdministration;
                 await AdministrationService.SetCurrentAdministration(CurrentAdministration);
 
             }

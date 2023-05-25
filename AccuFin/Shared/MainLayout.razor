@@ -20,7 +20,7 @@
             <MudPaper Class="pa-2">
 
                 <MudAutocomplete T="AdministrationCollectionItem"
-                  @ref="AdminstrationAutocomplete"
+                @ref="AdminstrationAutocomplete"
                                  SearchFunc="SearchAdministration"
                 @bind-Value="SelectedAdministration"
                 @bind-Value:after="SelectedAdministrationChanged"
@@ -33,13 +33,18 @@
         }
         @if (CurrentAdministration != null)
         {
-            <MudPaper Class="pa-2" Style="background-color:var(--mud-palette-primary-lighten);color:var(--mud-palette-primary-text) !important">
-
+            <MudPaper Class="pa-2" Style="background-color:var(--mud-palette-primary-lighten);color:var(--mud-palette-primary-text) !important;text-align:center">
+                @if (!string.IsNullOrWhiteSpace(CurrentAdministration.ImageFileName))
+                {
+                    <div style="width:100%;display: flex;justify-content: center;">
+                        <MudImage Height="64" Src="@("https://localhost:7058/filestore/images/" +CurrentAdministration.ImageFileName)"
+                                  Class="rounded-lg ma-4" ObjectFit="ObjectFit.ScaleDown" />
+                    </div>
+                }
                 <MudText Typo="Typo.subtitle1">@CurrentAdministration.Name</MudText>
                 @if (!string.IsNullOrWhiteSpace(CurrentAdministration.AdministrationRegistryCode))
                 {
                     <MudText Typo="Typo.caption">Kvk: @CurrentAdministration.AdministrationRegistryCode</MudText>
-                }
                 }
 
             </MudPaper>

@@ -14,7 +14,8 @@ namespace AccuFin.Data.Mappers
 
                 Id = entity.Id,
                 Name = entity.Name,
-                AdministrationRegistryCode = entity.AdministrationRegistryCode
+                AdministrationRegistryCode = entity.AdministrationRegistryCode,
+                ImageFileName = entity.HasImage ? entity.Id.ToString() + ".png" : null,
             };
         }
         public static AdministrationModel Map(this Administration entity)
@@ -25,6 +26,7 @@ namespace AccuFin.Data.Mappers
                 Name = entity.Name,
                 AdministrationRegistryCode = entity.AdministrationRegistryCode,
                 EmailAdress = entity.EmailAdress,
+                ImageFileName = entity.HasImage ? entity.Id.ToString() + ".png" : null,
                 TelephoneNumber = entity.TelephoneNumber
             };
         }
@@ -34,6 +36,7 @@ namespace AccuFin.Data.Mappers
             item.Id = model.Id;
             item.Name = model.Name;
             item.AdministrationRegistryCode = model.AdministrationRegistryCode;
+            item.HasImage = !string.IsNullOrWhiteSpace(model.ImageFileName);
             item.EmailAdress = model.EmailAdress;
             item.TelephoneNumber = model.TelephoneNumber;
             return item;
@@ -54,9 +57,9 @@ namespace AccuFin.Data.Mappers
         private static List<AdministrationRole> ToRoles(UserRoleInAdministration entityRoles)
         {
             List<AdministrationRole> roles = new List<AdministrationRole>();
-            foreach(var role in AdministrationRole.GetRoles())
+            foreach (var role in AdministrationRole.GetRoles())
             {
-                if(entityRoles.HasFlag((UserRoleInAdministration)role.Value))
+                if (entityRoles.HasFlag((UserRoleInAdministration)role.Value))
                 {
                     roles.Add(role);
                 }
@@ -74,7 +77,7 @@ namespace AccuFin.Data.Mappers
                 Name = entity.Name
             };
         }
-        
+
 
     }
 }

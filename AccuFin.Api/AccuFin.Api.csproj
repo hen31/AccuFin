@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="wwwroot\filestore\images\**" />
+    <Content Remove="wwwroot\filestore\images\**" />
+    <EmbeddedResource Remove="wwwroot\filestore\images\**" />
+    <None Remove="wwwroot\filestore\images\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0-preview.4.23260.4" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0-preview.4.23260.4" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.0-preview.4.23260.4" />
@@ -24,6 +31,10 @@
     <ProjectReference Include="..\AccuFin.Api.Models\AccuFin.Api.Models.csproj" />
     <ProjectReference Include="..\AccuFin.Data\AccuFin.Data.csproj" />
     <ProjectReference Include="..\AccuFin.Repository\AccuFin.Repository.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\filestore\" />
   </ItemGroup>
 
 </Project>

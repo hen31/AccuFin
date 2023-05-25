@@ -7,8 +7,9 @@
         /// KVK nummer
         /// </summary>
         public string AdministrationRegistryCode { get; set; }
-       
+
         public string TelephoneNumber { get; set; }
         public string EmailAdress { get; set; }
+        public bool HasImage { get; set; }
     }
 }

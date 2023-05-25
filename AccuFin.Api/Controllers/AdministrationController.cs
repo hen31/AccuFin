@@ -13,14 +13,17 @@ namespace AccuFin.Api.Controllers
     {
         private readonly UserRepository _userRepository;
         private readonly AdministrationRepository _administrationRepository;
+        private readonly IWebHostEnvironment _enviroment;
 
         public AdministrationController(AccuFinDatabaseContext accuFinDatabaseContext
             , UserRepository userRepository
-            , AdministrationRepository administrationRepository)
+            , AdministrationRepository administrationRepository,
+            IWebHostEnvironment enviroment)
             : base()
         {
             _userRepository = userRepository;
             _administrationRepository = administrationRepository;
+            _enviroment = enviroment;
         }
         [HttpGet("{id}")]
         [Authorize(Policy = Policy.Administrator)]
@@ -47,7 +50,13 @@ namespace AccuFin.Api.Controllers
             {
                 return BadRequest(ModelState);
             }
-            var item = await _administrationRepository.EditItemAsync(id, model);
+            var item = await _administrationRepository.GetItemByIdAsync(id);
+            if (item == null) { return null; }
+
+            await ProcessAdministrationImage(model);
+            item = await _administrationRepository.EditItemAsync(id, model);
+            RenameImageIfNeeded(model, item);
+
             //parse orderby;
             if (item == null)
             {
@@ -73,11 +82,11 @@ namespace AccuFin.Api.Controllers
             //parse orderby;
             return Ok(isDeleted);
         }
-        
+
 
         [HttpGet]
         [Authorize(Policy = Policy.Administrator)]
-        public async Task<ActionResult<FinCollection<AdministrationCollectionItem>>> GetCollectionAsync([FromQuery] int page, [FromQuery] int pageSize, [FromQuery] string orderBy = null, [FromQuery]string singleSearch = null)
+        public async Task<ActionResult<FinCollection<AdministrationCollectionItem>>> GetCollectionAsync([FromQuery] int page, [FromQuery] int pageSize, [FromQuery] string orderBy = null, [FromQuery] string singleSearch = null)
         {
             if (!ModelState.IsValid)
             {
@@ -96,7 +105,7 @@ namespace AccuFin.Api.Controllers
             }
             return Ok(await _administrationRepository.GetMyAdministrationsAsync(this.GetFinUserId()));
         }
-        
+
 
         [HttpPost]
         [Authorize(Policy = Policy.Administrator)]
@@ -106,7 +115,43 @@ namespace AccuFin.Api.Controllers
             {
                 return BadRequest(ModelState);
             }
-            return Ok(await _administrationRepository.AddItemAsync(model));
+            await ProcessAdministrationImage(model);
+            var item = await _administrationRepository.AddItemAsync(model);
+            RenameImageIfNeeded(model, item);
+            return Ok(item);
+        }
+
+        private void RenameImageIfNeeded(AdministrationModel model, AdministrationModel item)
+        {
+            if (!string.IsNullOrWhiteSpace(model.ImageFileName) && item.Id != Guid.Empty)
+            {
+                try
+                {
+                    System.IO.File.Move(_enviroment.WebRootPath + "/filestore/images/" + model.ImageFileName, _enviroment.WebRootPath + "/filestore/images/" + item.Id.ToString() + ".png", true);
+                }
+                catch (Exception ex)
+                {
+                }
+            }
+
+        }
+
+        private async Task ProcessAdministrationImage(AdministrationModel model)
+        {
+            try
+            {
+                if (model.ImageData != null)
+                {
+                    model.ImageFileName = Guid.NewGuid().ToString() + ".png";
+                    Directory.CreateDirectory(_enviroment.WebRootPath + "/filestore/images/");
+                    await System.IO.File.WriteAllBytesAsync(_enviroment.WebRootPath + "/filestore/images/" + model.ImageFileName, Convert.FromBase64String(model.ImageData));
+                }
+            }
+            catch (Exception ex)
+            {
+                model.ImageFileName = null;
+                model.ImageData = null;
+            }
         }
     }
 }
