@@ -12,6 +12,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using AccuFin.Api.Client;
 using AccuFin.Api;
+using AccuFin.Api.Services.BankIntegration;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("IdentityContextConnection") ?? throw new InvalidOperationException("Connection string 'IdentityContextConnection' not found.");
@@ -21,7 +22,7 @@ builder.Services.AddDbContext<IdentityContext>(options =>
 
 var connectionStringAccuFin = builder.Configuration.GetConnectionString("AccuFinContextConnection") ?? throw new InvalidOperationException("Connection string 'IdentityContextConnection' not found.");
 builder.Services.AddDbContext<AccuFinDatabaseContext>(options =>
-    options.UseSqlServer(connectionStringAccuFin));
+    options.UseSqlServer(connectionStringAccuFin, b=> b.MigrationsAssembly("AccuFin.Api")));
 builder.Services.AddCors(options =>
             options.AddPolicy("AllowAllOrigins", builder1 => builder1.WithOrigins("https://localhost:7266").AllowAnyHeader().AllowAnyMethod().AllowCredentials()));
 
@@ -68,7 +69,9 @@ builder.Services.AddAuthentication(options =>
 });
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 builder.Services.AddScoped<RoleService>();
-
+builder.Services.AddScoped<NordigenClient>();
+builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
+builder.Services.AddHttpClient();
 builder.Services.AddAccuFinRepositories();
 builder.Services.AddAccuFinModels();
 
@@ -89,8 +92,8 @@ using (var scope = app.Services.CreateScope())
     databaseContext?.Database.Migrate();
 
     var databaseContextImkery = scope.ServiceProvider.GetService<AccuFinDatabaseContext>();
-    //databaseContextImkery?.Database.EnsureDeleted();
-    databaseContextImkery?.Database.EnsureCreated();
+  //  databaseContextImkery?.Database.EnsureDeleted();
+   // databaseContextImkery?.Database.EnsureCreated();
     databaseContextImkery?.Database.Migrate();
 
 

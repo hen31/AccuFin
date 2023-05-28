@@ -9,8 +9,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccuFin.Api", "AccuFin.Api\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccuFin.Api.Client", "AccuFin.Api.Client\AccuFin.Api.Client.csproj", "{AB4EBAFF-B484-4615-9013-9DE4959B7F85}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccuFin.Test", "AccuFin.Test\AccuFin.Test.csproj", "{F0B662BD-2C75-4AFD-8DAF-B9FAA551FCF0}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccuFin.Api.Models", "AccuFin.Api.Models\AccuFin.Api.Models.csproj", "{E207A87C-8C5C-418A-BDFC-E57F5AEF1936}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccuFin", "AccuFin\AccuFin.csproj", "{199C75B4-CAE1-4ED5-BAAC-EF935C518227}"
@@ -35,10 +33,6 @@ Global
 		{AB4EBAFF-B484-4615-9013-9DE4959B7F85}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AB4EBAFF-B484-4615-9013-9DE4959B7F85}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AB4EBAFF-B484-4615-9013-9DE4959B7F85}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F0B662BD-2C75-4AFD-8DAF-B9FAA551FCF0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F0B662BD-2C75-4AFD-8DAF-B9FAA551FCF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F0B662BD-2C75-4AFD-8DAF-B9FAA551FCF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F0B662BD-2C75-4AFD-8DAF-B9FAA551FCF0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E207A87C-8C5C-418A-BDFC-E57F5AEF1936}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E207A87C-8C5C-418A-BDFC-E57F5AEF1936}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E207A87C-8C5C-418A-BDFC-E57F5AEF1936}.Release|Any CPU.ActiveCfg = Release|Any CPU

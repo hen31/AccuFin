@@ -1,0 +1,34 @@
+﻿@page "/integration"
+@using AccuFin.Api.Models.BankIntegration;
+@if (Banks != null && Banks.Success)
+{
+    @if (Administrations != null && Administrations.Success)
+    {
+        <MudSelect T="AdministrationCollectionItem" Label="Selecteer administratie" AutoFocus=true @bind-Value=SelectedAdministration>
+            @foreach (var administration in Administrations.Data)
+            {
+                <MudSelectItem Value="@administration"><MudText Class="align-center" Inline=true>@administration.Name</MudText></MudSelectItem>
+            }
+        </MudSelect>
+    }
+
+
+    <MudSelect T="BankModel" Label="Selecteer bank" AutoFocus=true @bind-Value=SelectedBank>
+        @foreach (var bank in Banks.Data)
+        {
+            <MudSelectItem Value="@bank"><MudImage Src="@bank.Logo" Height="16"></MudImage> <MudText Class="align-center" Inline=true>@bank.Name</MudText></MudSelectItem>
+        }
+    </MudSelect>
+
+
+
+    <MudButton OnClick="GetLink">Get link</MudButton>
+    @if (BankLink != null && BankLink.Success)
+    {
+        <MudLink Href="@BankLink.Data.Link">Klik hier om integratie te starten</MudLink>
+    }
+
+}
+@code {
+
+}

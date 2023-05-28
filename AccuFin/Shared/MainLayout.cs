@@ -17,7 +17,8 @@ namespace AccuFin.Shared
 
         [Inject]
         public AdministrationService AdministrationService { get; set; }
-
+        [Inject]
+        public BankIntegrationClient BankIntegrationClient { get; set; }
         public AdministrationCollectionItem CurrentAdministration { get; set; }
 
         public AdministrationCollectionItem SelectedAdministration { get; set; }
