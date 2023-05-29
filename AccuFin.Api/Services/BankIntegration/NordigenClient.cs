@@ -58,10 +58,13 @@ namespace AccuFin.Api.Services.BankIntegration
 
         internal async Task<TransactionsResultModel> GetTransactionsAsync(string accountId)
         {
-            var request = await GetAutherizedHttpRequest($"https://ob.nordigen.com/api/v2/accounts/{accountId}/transactions/​", false);
-            request.Method = HttpMethod.Get;
             var httpClient = _httpClientFactory.CreateClient();
             httpClient.DefaultRequestHeaders.Clear();
+
+            string url = $"https://ob.nordigen.com/api/v2/accounts/{accountId}/transactions/";
+            var request = await GetAutherizedHttpRequest(url, false);
+            request.Method = HttpMethod.Get;
+  
             var result = await httpClient.SendAsync(request);
             return await result.Content.ReadFromJsonAsync<TransactionsResultModel>();
         }
@@ -105,8 +108,7 @@ namespace AccuFin.Api.Services.BankIntegration
                 string jsonContent = JsonConvert.SerializeObject(new { secret_id = _configuration["nordigen:secret_id"], secret_key = _configuration["nordigen:secret_key"] });
                 httpRequest.Content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
                 var result = await httpClient.SendAsync(httpRequest);
-                return await result.Content.ReadFromJsonAsync<SecretResult>();
-               // _currentToken = await result.Content.ReadFromJsonAsync<SecretResult>();
+               _currentToken = await result.Content.ReadFromJsonAsync<SecretResult>();
             }
             return _currentToken;
         }

@@ -38,10 +38,6 @@ namespace AccuFin.Api.Controllers
                 return BadRequest(ModelState);
             }
             var item = await _administrationRepository.GetItemByIdAsync(id);
-            foreach (var account in item.BankAccounts)
-            {
-                var transactions = await _nordigenClient.GetTransactionsAsync(account.AccountId);
-            }
             if (item == null)
             {
                 return BadRequest("Niet gevonden");
