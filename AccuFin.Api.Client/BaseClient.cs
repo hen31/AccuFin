@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace AccuFin.Api.Client
 {
@@ -106,7 +107,20 @@ namespace AccuFin.Api.Client
             httpReponse = await TryRefreshingTokenIfNeededAsync(() => HttpClient.GetAsync(BaseUrl + Area + url), httpReponse);
             return await HandleResponse<ResultType, string, Response<ResultType>>(httpReponse);
         }
+        protected static string GenerateCollectionParametersUrl(int page, int pageSize, string[] orderBy, string singleSearch)
+        {
+            string parametersUrl = $"?page={page}&pageSize={pageSize}";
 
+            if (orderBy != null && orderBy.Length > 0)
+            {
+                parametersUrl += $"&orderby={string.Join(',', orderBy)}";
+            }
+            if (!string.IsNullOrWhiteSpace(singleSearch))
+            {
+                parametersUrl += $"&singleSearch={HttpUtility.UrlEncode(singleSearch)}";
+            }
+            return parametersUrl;
+        }
         private async Task<HttpResponseMessage> TryRefreshingTokenIfNeededAsync(Func<Task<HttpResponseMessage>> doRequest, HttpResponseMessage httpReponse)
         {
             if (httpReponse.StatusCode != System.Net.HttpStatusCode.Unauthorized)

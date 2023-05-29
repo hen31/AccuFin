@@ -31,20 +31,7 @@ namespace AccuFin.Api.Client
         {
             return DoPostRequest<AdministrationModel, List<ValidationError>>($"/{administration.Id}", administration);
         }
-        private static string GenerateCollectionParametersUrl(int page, int pageSize, string[] orderBy, string singleSearch)
-        {
-            string parametersUrl = $"?page={page}&pageSize={pageSize}";
-
-            if (orderBy != null && orderBy.Length > 0)
-            {
-                parametersUrl += $"&orderby={string.Join(',', orderBy)}";
-            }
-            if(!string.IsNullOrWhiteSpace(singleSearch))
-            {
-                parametersUrl += $"&singleSearch={HttpUtility.UrlEncode(singleSearch)}";
-            }
-            return parametersUrl;
-        }
+     
 
         public Task<Response<AdministrationModel, List<ValidationError>>> AddAdministrationAsync(AdministrationModel administration)
         {

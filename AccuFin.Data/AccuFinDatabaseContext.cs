@@ -20,5 +20,6 @@ namespace AccuFin.Data
         public DbSet<UserAdministrationLink> UserAdministrationLink { get; set; }
         public DbSet<BankIntegration> BankIntegrations { get; set; }
         public DbSet<LinkBankAccount> LinkBankAccounts { get; set; }
+        public DbSet<Transaction> Transactions { get; set; }
     }
 }

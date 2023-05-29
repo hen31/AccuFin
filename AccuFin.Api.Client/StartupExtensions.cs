@@ -11,6 +11,7 @@ namespace AccuFin.Api.Client
             serviceCollection.AddScoped<UserClient>();
             serviceCollection.AddScoped<AdministrationClient>();
             serviceCollection.AddScoped<BankIntegrationClient>();
+            serviceCollection.AddScoped<TransactionClient>();
             
         }
         

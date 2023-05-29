@@ -1,0 +1,37 @@
+﻿@page "/transactions"
+
+
+@if (CollectionSource != null)
+{
+    <CollectionGridComponent T="TransactionCollectionItem"
+                             CollectionSource="@CollectionSource"
+                             Title="Transacties"
+                             RewriteUrl="true"
+                             AllowFilter="true">
+        <Columns>
+
+            <PropertyColumn Property="x => x.TransactionDate" Title="OP" Sortable="true" />
+            <PropertyColumn Property="x => x.IBAN" Title="Van" Sortable="true" />
+            <PropertyColumn Property="x => x.ToIBAN" Title="Naar" Sortable="true" />
+            <PropertyColumn Property="x => x.Amount" Title="€" Sortable="true" />
+            <PropertyColumn Property="x => x.Description" Title="Omschrijving" Sortable="false" />
+        </Columns>
+    </CollectionGridComponent>
+}
+
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        CollectionSource = TransactionClient.GetCollectionSource((await AdministrationService.GetCurrentAdministration()).Id);
+    }
+
+    public ICollectionSourceClient<TransactionCollectionItem> CollectionSource { get; set; }
+
+    [Inject]
+    public AdministrationService AdministrationService { get; set; }
+    [Inject]
+    public TransactionClient TransactionClient { get; set; }
+
+
+}

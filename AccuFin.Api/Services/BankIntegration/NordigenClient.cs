@@ -66,6 +66,7 @@ namespace AccuFin.Api.Services.BankIntegration
             request.Method = HttpMethod.Get;
   
             var result = await httpClient.SendAsync(request);
+           // string json =  await result.Content.ReadAsStringAsync();
             return await result.Content.ReadFromJsonAsync<TransactionsResultModel>();
         }
         

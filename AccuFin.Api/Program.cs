@@ -74,6 +74,7 @@ builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 builder.Services.AddHttpClient();
 builder.Services.AddAccuFinRepositories();
 builder.Services.AddAccuFinModels();
+builder.Services.AddHostedService<BankTransactionSyncService>();
 
 var app = builder.Build();
 app.UseStaticFiles();

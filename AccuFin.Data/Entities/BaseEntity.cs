@@ -20,4 +20,9 @@
     {
 
     }
+
+    public abstract class BaseEntityULongId : BaseEntity<ulong>
+    {
+
+    }
 }

@@ -7,7 +7,19 @@ namespace AccuFin.Data.Mappers
 {
     public static class ModelMappers
     {
+        public static TransactionCollectionItem MapForCollection(this Data.Entities.Transaction entity)
+        {
+            return new TransactionCollectionItem()
+            {
 
+                Id = entity.Id,
+                Description = entity.UnstructeredInformation,
+                Amount = entity.Amount,
+                IBAN = entity.FromIBAN,
+                ToIBAN = entity.ToIBAN,
+                TransactionDate = entity.TransactionDate
+            };
+        }
         public static AdministrationCollectionItem MapForCollection(this Administration entity)
         {
             return new AdministrationCollectionItem()

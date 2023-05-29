@@ -9,6 +9,7 @@ namespace AccuFin.Repository
             serviceCollection.AddScoped<UserRepository>();
             serviceCollection.AddScoped<AdministrationRepository>();
             serviceCollection.AddScoped<BankIntegrationRepository>();
+            serviceCollection.AddScoped<TransactionRepository>();
         }
     }
 }
