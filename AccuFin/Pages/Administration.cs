@@ -33,6 +33,8 @@ namespace AccuFin.Pages
         public NavigationManager NavigationManager { get; set; }
         public IEnumerable<LinkBankAccountModel> SelectedAccounts { get; set; }
 
+        
+
         protected override async Task OnInitializedAsync()
         {
             Roles = AdministrationRole.GetRoles();

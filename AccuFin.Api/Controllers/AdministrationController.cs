@@ -1,4 +1,5 @@
 ﻿using AccuFin.Api.Models;
+using AccuFin.Api.Services.BankIntegration;
 using AccuFin.Data;
 using AccuFin.Repository;
 using Microsoft.AspNetCore.Authorization;
@@ -13,16 +14,19 @@ namespace AccuFin.Api.Controllers
     {
         private readonly UserRepository _userRepository;
         private readonly AdministrationRepository _administrationRepository;
+        private readonly NordigenClient _nordigenClient;
         private readonly IWebHostEnvironment _enviroment;
 
         public AdministrationController(AccuFinDatabaseContext accuFinDatabaseContext
             , UserRepository userRepository
             , AdministrationRepository administrationRepository,
+            NordigenClient nordigenClient,
             IWebHostEnvironment enviroment)
             : base()
         {
             _userRepository = userRepository;
             _administrationRepository = administrationRepository;
+            _nordigenClient = nordigenClient;
             _enviroment = enviroment;
         }
         [HttpGet("{id}")]
@@ -34,6 +38,10 @@ namespace AccuFin.Api.Controllers
                 return BadRequest(ModelState);
             }
             var item = await _administrationRepository.GetItemByIdAsync(id);
+            foreach (var account in item.BankAccounts)
+            {
+                var transactions = await _nordigenClient.GetTransactionsAsync(account.AccountId);
+            }
             if (item == null)
             {
                 return BadRequest("Niet gevonden");

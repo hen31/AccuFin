@@ -84,6 +84,7 @@ namespace AccuFin.Repository
             var itemModel = item.Map();
             itemModel.Users = (await GetUsersForAdministrationMapped(item)).Select(b => b.Map()).ToList();
             itemModel.BankAccounts = (await _bankIntegrationRepository.GetLinkedBankAccountsAsync(item.Id));
+          
             return itemModel;
         }
 

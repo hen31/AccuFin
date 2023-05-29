@@ -58,8 +58,11 @@ namespace AccuFin.Api.Services.BankIntegration
 
         internal async Task<TransactionsResultModel> GetTransactionsAsync(string accountId)
         {
-            HttpClient httpClient = await GetClientForAutherizedRequest();
-            var result = await httpClient.GetAsync($"https://ob.nordigen.com/​api​/v2​/accounts​/{accountId}​/transactions​/");
+            var request = await GetAutherizedHttpRequest($"https://ob.nordigen.com/api/v2/accounts/{accountId}/transactions/​", false);
+            request.Method = HttpMethod.Get;
+            var httpClient = _httpClientFactory.CreateClient();
+            httpClient.DefaultRequestHeaders.Clear();
+            var result = await httpClient.SendAsync(request);
             return await result.Content.ReadFromJsonAsync<TransactionsResultModel>();
         }
         

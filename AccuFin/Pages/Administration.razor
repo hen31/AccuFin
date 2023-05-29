@@ -61,7 +61,7 @@
                    MultiSelection=true
         @bind-SelectedValues="@SelectedAccounts"
                    ToStringFunc="(b)=> b.IBAN"
-                   Label="Gekoppelde bankrekkeningen">
+                   Label="Gegevens ophalen van bankrekkeningen">
             @foreach (var accountInfo in context.BankAccounts)
             {
                 <MudSelectItem T="LinkBankAccountModel" Value="accountInfo">@accountInfo.IBAN</MudSelectItem>
