@@ -29,7 +29,6 @@ namespace AccuFin.Api.Client
         {
             return DoGetRequest<ICollection<ExternalBankAccountModel>>($"/getaccountinformation/{administrationId}");
         }
-        
     }
 }
 

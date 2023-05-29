@@ -1,4 +1,5 @@
 ﻿using AccuFin.Api.Models;
+using AccuFin.Api.Models.BankIntegration;
 using AccuFin.Api.Models.User;
 using AccuFin.Data.Entities;
 
@@ -75,6 +76,17 @@ namespace AccuFin.Data.Mappers
                 Id = entity.Id,
                 Email = entity.EmailAdress,
                 Name = entity.Name
+            };
+        }
+
+        public static LinkBankAccountModel Map(this LinkBankAccount entity)
+        {
+            return new()
+            {
+                Id = entity.Id,
+                IBAN = entity.IBAN,
+                AccountId = entity.AccountId,
+                Sync = entity.Sync
             };
         }
 

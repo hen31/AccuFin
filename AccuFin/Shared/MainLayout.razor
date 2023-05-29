@@ -55,13 +55,6 @@
                 <MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Contacts" Href="/administrations" IconColor="Color.Inherit">Administraties</MudNavLink>
             </Authorized>
         </AuthorizeView>
-
-        @if (CurrentAdministration != null)
-        {
-            <MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.ManageAccounts" Href="@("/integrationdone/" + CurrentAdministration.Id)" IconColor="Color.Inherit">Integratie verder</MudNavLink>
-        }
-
-        <MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.ManageAccounts" Href="/integration" IconColor="Color.Inherit">Integratie</MudNavLink>
         <MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.ManageAccounts" Href="/account" IconColor="Color.Inherit">Account</MudNavLink>
         <MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Logout" OnClick="LogOff" IconColor="Color.Inherit">Uitloggen</MudNavLink>
     </MudDrawer>

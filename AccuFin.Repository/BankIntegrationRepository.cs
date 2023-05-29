@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AccuFin.Api.Models.BankIntegration;
+using AccuFin.Data.Mappers;
 
 namespace AccuFin.Repository
 {
@@ -51,6 +53,46 @@ namespace AccuFin.Repository
             integration.AcceptedOn = DateTime.UtcNow;
             bankIntegrationRepository.Update(integration);
             await DatabaseContext.SaveChangesAsync();
+        }
+
+
+        public async Task<LinkBankAccount> LinkBankAccountAsync(Guid administrationId, string accountId, string iban)
+        {
+            EntityRepository<LinkBankAccount, Guid> linkBankAccountRepository = new EntityRepository<LinkBankAccount, Guid>(DatabaseContext);
+            if (await DatabaseContext.LinkBankAccounts.AnyAsync(b => b.IBAN == iban && b.AdministrationId == administrationId))
+            {
+                return null;
+            }
+            LinkBankAccount linkBank = new LinkBankAccount();
+            linkBank.AdministrationId = administrationId;
+            linkBank.AccountId = accountId;
+            linkBank.IBAN = iban;
+            linkBank.Sync = false;
+            await linkBankAccountRepository.Add(linkBank);
+            await DatabaseContext.SaveChangesAsync();
+            return linkBank;
+        }
+
+
+        public async Task<List<LinkBankAccountModel>> SyncBankAccountsAsync(Guid administrationId, List<LinkBankAccountModel> accounts)
+        {
+            EntityRepository<LinkBankAccount, Guid> linkBankAccountRepository = new EntityRepository<LinkBankAccount, Guid>(DatabaseContext);
+            foreach (var item in accounts)
+            {
+                var linkAccount = await linkBankAccountRepository.GetById(item.Id);
+                if (linkAccount != null)
+                {
+                    linkAccount.Sync = item.Sync;
+                    linkBankAccountRepository.Update(linkAccount);
+                }
+            }
+            await DatabaseContext.SaveChangesAsync();
+            return await GetLinkedBankAccountsAsync(administrationId);
+        }
+
+        public async Task<List<LinkBankAccountModel>> GetLinkedBankAccountsAsync(Guid administrationId)
+        {
+            return (await DatabaseContext.LinkBankAccounts.Where(b => b.AdministrationId == administrationId).ToListAsync()).Select(b => b.Map()).ToList();
         }
     }
 }

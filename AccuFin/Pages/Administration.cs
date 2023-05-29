@@ -4,6 +4,8 @@ using AccuFin.Shared.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
+using AccuFin.Api.Models.BankIntegration;
+using System.Security.Principal;
 
 namespace AccuFin.Pages
 {
@@ -29,6 +31,7 @@ namespace AccuFin.Pages
         public MudForm Form { get; set; }
         [Inject]
         public NavigationManager NavigationManager { get; set; }
+        public IEnumerable<LinkBankAccountModel> SelectedAccounts { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
@@ -54,6 +57,7 @@ namespace AccuFin.Pages
                 var response = await AdministrationClient.GetAdministrationByIdAsync(Id);
                 if (response.Success)
                 {
+                    SelectedAccounts = response.Data.BankAccounts.Where(b => b.Sync);
                     return new InitializeEditFormResult<AdministrationModel>(response.Data, response);
                 }
                 else
@@ -63,6 +67,7 @@ namespace AccuFin.Pages
             }
         }
 
+
         private async Task<Response<bool>> DeleteModelAsync(AdministrationModel model)
         {
             return await AdministrationClient.DeleteAdministrationAsync(model.Id);
@@ -70,6 +75,17 @@ namespace AccuFin.Pages
 
         private async Task<Response<AdministrationModel, List<ValidationError>>> OnSave(AdministrationModel model)
         {
+            foreach (var account in model.BankAccounts)
+            {
+                if(SelectedAccounts.Contains(account))
+                {
+                    account.Sync = true;
+                }
+                else
+                {
+                    account.Sync = false;
+                }
+            }
             if (Id == Guid.Empty)
             {
                 return await AdministrationClient.AddAdministrationAsync(model);

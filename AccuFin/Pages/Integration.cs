@@ -8,10 +8,14 @@ namespace AccuFin.Pages
 {
     public partial class Integration : ComponentBase
     {
+        [Parameter]
+        public Guid AdministrationId { get; set; }
         [Inject]
         public BankIntegrationClient BankIntegrationClient { get; set; }
         [Inject]
         public AdministrationClient AdministrationClient { get; set; }
+        [Inject]
+        public NavigationManager NavigationManager { get; set; }
         public Response<ICollection<BankModel>> Banks { get; private set; }
         [Inject]
         public ISnackbar Snackbar { get; set; }
@@ -19,7 +23,6 @@ namespace AccuFin.Pages
         public BankModel SelectedBank { get; set; }
         public Response<BankLinkAuthorizationModel> BankLink { get; set; }
         public AdministrationCollectionItem SelectedAdministration { get; set; }
-        public Response<IEnumerable<AdministrationCollectionItem>> Administrations { get; set; }
         protected override async Task OnInitializedAsync()
         {
             Banks = await BankIntegrationClient.GetCollectionAsync();
@@ -27,10 +30,14 @@ namespace AccuFin.Pages
             {
                 Snackbar.Add("Ophalen banken is mislukt", Severity.Error);
             }
-            Administrations = await AdministrationClient.GetMyAdministrations();
-            if (!Administrations.Success)
+            var administrations = await AdministrationClient.GetMyAdministrations();
+            if (!administrations.Success)
             {
                 Snackbar.Add("Ophalen administraties is mislukt", Severity.Error);
+            }
+            else
+            {
+                SelectedAdministration = administrations.Data.FirstOrDefault(b=> b.Id ==  AdministrationId);
             }
         }
 
@@ -39,6 +46,7 @@ namespace AccuFin.Pages
             if (SelectedBank != null && SelectedAdministration != null)
             {
                 BankLink = await BankIntegrationClient.GetLinkAsync(SelectedBank, SelectedAdministration.Id);
+                NavigationManager.NavigateTo(BankLink.Data.Link);
             }
         }
     }

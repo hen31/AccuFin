@@ -1,4 +1,6 @@
-﻿using System.Security.Claims;
+﻿using AccuFin.Repository;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace AccuFin.Api
 {
@@ -8,5 +10,7 @@ namespace AccuFin.Api
         {
             return context.User.Claims.FirstOrDefault(b => b.Type == ClaimTypes.Email)?.Value;
         }
+
+    
     }
 }

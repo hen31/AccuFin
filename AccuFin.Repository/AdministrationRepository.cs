@@ -8,9 +8,12 @@ namespace AccuFin.Repository
 {
     public class AdministrationRepository : BaseRepository
     {
-        public AdministrationRepository(AccuFinDatabaseContext databaseContext)
+        private readonly BankIntegrationRepository _bankIntegrationRepository;
+
+        public AdministrationRepository(AccuFinDatabaseContext databaseContext, BankIntegrationRepository bankIntegrationRepository)
             : base(databaseContext)
         {
+            _bankIntegrationRepository = bankIntegrationRepository;
         }
         public async Task<AdministrationModel> AddItemAsync(AdministrationModel administration)
         {
@@ -80,6 +83,7 @@ namespace AccuFin.Repository
             }
             var itemModel = item.Map();
             itemModel.Users = (await GetUsersForAdministrationMapped(item)).Select(b => b.Map()).ToList();
+            itemModel.BankAccounts = (await _bankIntegrationRepository.GetLinkedBankAccountsAsync(item.Id));
             return itemModel;
         }
 
@@ -95,6 +99,7 @@ namespace AccuFin.Repository
             if (item == null) { return null; }
             item = model.Map(item);
             administrationRepository.Update(item);
+            await _bankIntegrationRepository.SyncBankAccountsAsync(id, model.BankAccounts);
             await UpdateOrAddUsersToAdministration(item, model.Users);
             var mappedItem = item.Map();
             await DatabaseContext.SaveChangesAsync();

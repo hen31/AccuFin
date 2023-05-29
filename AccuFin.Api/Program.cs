@@ -92,9 +92,9 @@ using (var scope = app.Services.CreateScope())
     databaseContext?.Database.Migrate();
 
     var databaseContextImkery = scope.ServiceProvider.GetService<AccuFinDatabaseContext>();
-  //  databaseContextImkery?.Database.EnsureDeleted();
-   // databaseContextImkery?.Database.EnsureCreated();
-    databaseContextImkery?.Database.Migrate();
+    //databaseContextImkery?.Database.EnsureDeleted();
+    databaseContextImkery?.Database.EnsureCreated();
+    //databaseContextImkery?.Database.Migrate();
 
 
 

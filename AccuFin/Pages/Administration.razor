@@ -1,5 +1,6 @@
 ﻿@page "/administration"
 @page "/administration/{Id:guid}"
+@using AccuFin.Api.Models.BankIntegration;
 
 <EditModelComponent ModelType="AdministrationModel"
                     OnGetModel="GetModelAsync"
@@ -54,7 +55,20 @@
     <MudTextField Label="Email" Class="mt-3"
     @bind-Value="context.EmailAdress" For="@(() =>context.EmailAdress)" />
 
-
+    @if (context.Id != Guid.Empty)
+    {
+        <MudSelect T="LinkBankAccountModel"
+                   MultiSelection=true
+        @bind-SelectedValues="@SelectedAccounts"
+                   ToStringFunc="(b)=> b.IBAN"
+                   Label="Gekoppelde bankrekkeningen">
+            @foreach (var accountInfo in context.BankAccounts)
+            {
+                <MudSelectItem T="LinkBankAccountModel" Value="accountInfo">@accountInfo.IBAN</MudSelectItem>
+            }
+        </MudSelect>
+        <MudButton Class="pa-2 mt-auto" Size="Size.Medium" Href="@("integration/" + context.Id)" Color="Color.Primary">Koppeling opzetten</MudButton>
+    }
 
     <MudDataGrid T="UserAdministrationLinkModel" Items="context.Users" Class="mt-3">
         <ToolBarContent>

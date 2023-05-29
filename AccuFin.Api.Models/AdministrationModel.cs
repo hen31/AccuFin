@@ -1,4 +1,5 @@
-﻿using AccuFin.Api.Models.User;
+﻿using AccuFin.Api.Models.BankIntegration;
+using AccuFin.Api.Models.User;
 using FluentValidation;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,7 @@ namespace AccuFin.Api.Models
         public string EmailAdress { get; set; }
 
         public List<UserAdministrationLinkModel> Users { get; set; } = new List<UserAdministrationLinkModel>();
+        public List<LinkBankAccountModel> BankAccounts { get; set; } = new List<LinkBankAccountModel>();
         public string ImageData { get; set; }
         public string ImageFileName { get; set; }
 

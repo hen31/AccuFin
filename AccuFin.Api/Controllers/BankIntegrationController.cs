@@ -43,25 +43,17 @@ namespace AccuFin.Api.Controllers
             return Ok(await _nordigenClient.GetBanksAsync());
         }
 
-
-
-
         [HttpGet("getlink/{institution}/{administrationId}")]
         [Authorize()]
         public async Task<ActionResult<BankLinkAuthorizationModel>> GetLink(string institution, Guid administrationId)
         {
-            var userId = this.GetFinUserId();
-            var clientId = this.GetClientId();
-            if (userId == Guid.Empty || string.IsNullOrWhiteSpace(clientId))
+            if (await this.IsUserAuthorizedForAdministration(_administrationRepository,
+                administrationId) == false)
             {
                 return BadRequest();
             }
-            if (!(await _administrationRepository.GetMyAdministrationsAsync(userId)).Any(b => b.Id == administrationId))
-            {
-                return Unauthorized();
-            }
             var bankLink = await _nordigenClient.GenerateBankLinkAsyc($"{GetBaseUrl()}/bankintegration/done", institution);
-            await _bankIntegrationRepository.AddIntegration(userId, administrationId, institution, bankLink.Link, bankLink.Reference, clientId, bankLink.Id);
+            await _bankIntegrationRepository.AddIntegration(this.GetFinUserId(), administrationId, institution, bankLink.Link, bankLink.Reference, this.GetClientId(), bankLink.Id);
             return Ok(bankLink);
         }
 
@@ -69,14 +61,10 @@ namespace AccuFin.Api.Controllers
         [Authorize()]
         public async Task<ActionResult<ICollection<ExternalBankAccountModel>>> GetAccountsForAdministrationAsync(Guid administrationId)
         {
-            var userId = this.GetFinUserId();
-            if (userId == Guid.Empty)
+            if (await this.IsUserAuthorizedForAdministration(_administrationRepository,
+               administrationId) == false)
             {
                 return BadRequest();
-            }
-            if (!(await _administrationRepository.GetMyAdministrationsAsync(userId)).Any(b => b.Id == administrationId))
-            {
-                return Unauthorized();
             }
             List<ExternalBankAccountModel> results = new List<ExternalBankAccountModel>();
             var integrations = await _bankIntegrationRepository.GetActiveIntegrationsForAdministrationAsync(administrationId);
@@ -115,9 +103,21 @@ namespace AccuFin.Api.Controllers
         {
             var integration = await _bankIntegrationRepository.GetIntegrationAsync(linkReference);
             await _bankIntegrationRepository.SetAuthorized(integration);
+
+            var integrations = await _bankIntegrationRepository.GetActiveIntegrationsForAdministrationAsync(integration.AdministrationId);
+            foreach (var currentIntegration in integrations)
+            {
+                var accounts = await _nordigenClient.GetBankAccountsInfoAsync(integration.ExternalLinkId);
+                foreach (var account in accounts.Accounts)
+                {
+                    var accountInfo = await _nordigenClient.GetAcountInfoAsync(account);
+                    await _bankIntegrationRepository.LinkBankAccountAsync(integration.AdministrationId, accountInfo.Id, accountInfo.Iban);
+                }
+            }
+
             if (integration.ClientId == "AccuFin.Online")
             {
-                return Redirect($"https://localhost:7266/integrationdone/{integration.AdministrationId}");
+                return Redirect($"https://localhost:7266/administration/{integration.AdministrationId}");
             }
             return Ok("true");
         }
